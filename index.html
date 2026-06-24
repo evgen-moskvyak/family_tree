@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Родинна Хроніка — Інтерактивна Генеалогічна Схема</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'Fira Code', 'ui-monospace', 'monospace'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        ide: {
+                            bg: 'var(--ide-bg)',         
+                            canvas: 'var(--ide-canvas)', 
+                            panel: 'var(--ide-panel)',   
+                            panelLight: 'var(--ide-panel-light)', 
+                            border: 'var(--ide-border)',     
+                            borderLight: 'var(--ide-border-light)',
+                            textBright: 'var(--ide-text-bright)',  
+                            textMuted: 'var(--ide-text-muted)',   
+                            accent: 'var(--ide-accent)',      
+                            accentGlow: 'var(--ide-accent-glow)',
+                            male: 'var(--ide-male)',        
+                            female: 'var(--ide-female)'     
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Темна тема IDE (за дефолтом) */
+            --ide-bg: #090d16;
+            --ide-canvas: #0f172a;
+            --ide-panel: #1e293b;
+            --ide-panel-light: #334155;
+            --ide-border: #1e293b;
+            --ide-border-light: #334155;
+            --ide-text-bright: #f8fafc;
+            --ide-text-muted: #94a3b8;
+            --ide-accent: #10b981;
+            --ide-accent-glow: rgba(16, 185, 129, 0.25);
+            --ide-male: #3b82f6;
+            --ide-female: #ec4899;
+            --grid-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        body.theme-light {
+            /* Елегантна світла тема */
+            --ide-bg: #f4f4f5;
+            --ide-canvas: #fafafa;
+            --ide-panel: #ffffff;
+            --ide-panel-light: #e4e4e7;
+            --ide-border: #e4e4e7;
+            --ide-border-light: #d4d4d8;
+            --ide-text-bright: #18181b;
+            --ide-text-muted: #71717a;
+            --ide-accent: #0d9488; 
+            --ide-accent-glow: rgba(13, 148, 136, 0.2);
+            --ide-male: #2563eb;
+            --ide-female: #db2777;
+            --grid-color: rgba(0, 0, 0, 0.03);
+        }
+
+        body {
+            background-color: var(--ide-bg);
+            color: var(--ide-text-bright);
+            user-select: none;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--ide-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--ide-panel-light);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--ide-border-light);
+        }
+        
+        .grid-bg {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+        }
+        
+        .neon-active {
+            box-shadow: 0 0 20px var(--ide-accent-glow) !important;
+            border-color: var(--ide-accent) !important;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased overflow-hidden h-screen flex flex-col bg-ide-bg text-ide-textBright">
+
+    <!-- Header -->
+    <header class="border-b border-ide-panel/80 bg-[#0c1322] px-6 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-md z-30 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-ide-accent/10 border border-ide-accent flex items-center justify-center text-xl shadow-lg shadow-ide-accent/5">
+                <span class="text-ide-accent font-mono font-bold">&lt;/&gt;</span>
+            </div>
+            <div>
+                <h1 class="font-mono text-lg font-bold tracking-tight text-ide-textBright flex items-center gap-2">
+                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">NODE v4.0</span>
+                </h1>
+                <p class="text-[10px] text-ide-textMuted font-mono uppercase tracking-wider">Генеалогічна схема з інтерактивним перетягуванням та визначенням зв'язків</p>
+            </div>
+        </div>
+
+        <!-- Toolbar Actions -->
+        <div class="flex flex-wrap items-center justify-center gap-2">
+            <input type="file" id="import-json-input" accept=".json" class="hidden" />
+
+            <!-- Кнопка перемикання теми оформлення -->
+            <button id="theme-toggle-btn" class="bg-ide-panel border border-ide-borderLight/40 hover:border-ide-accent text-ide-textBright hover:bg-ide-panelLight px-3 py-2 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 shadow-sm" title="Змінити тему оформлення">
+                <span id="theme-icon">☀️</span>
+                <span class="hidden md:inline" id="theme-text">Світла тема</span>
+            </button>
+
+            <!-- Кнопка швидкого імпорту в робочій області із попередженням -->
+            <button id="toolbar-import-btn" class="bg-ide-panel border border-ide-borderLight/40 hover:border-ide-accent text-ide-textBright hover:bg-ide-panelLight px-3.5 py-2 rounded-lg text-xs font-mono transition-all flex items-center gap-2 shadow-sm" title="Імпортувати збережений файл JSON">
+                <span class="text-ide-accent">📂</span>
+                <span>Імпорт проекту (JSON)</span>
+            </button>
+
+            <!-- Кнопка збереження проекту -->
+            <button id="export-json-btn" class="opacity-40 pointer-events-none cursor-not-allowed bg-ide-panel border border-ide-borderLight/40 hover:border-ide-accent text-ide-textBright hover:bg-ide-panelLight px-3.5 py-2 rounded-lg text-xs font-mono transition-all flex items-center gap-2 shadow-sm" title="Зберегти схему з усіма координатами у файл .json">
+                <span class="text-ide-accent">&lt;JSON&gt;</span>
+                <span>Зберегти у файл</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-grow flex flex-row min-h-0 relative">
+        
+        <!-- Sidebar Panel -->
+        <aside id="sidebar" class="absolute lg:relative left-0 top-0 bottom-0 w-96 border-r border-ide-panel bg-[#0b0f19] p-4 flex flex-col shrink-0 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 z-20 shadow-xl lg:shadow-none">
+            
+            <div class="flex lg:hidden justify-between items-center mb-4 pb-2 border-b border-ide-panel">
+                <span class="font-mono text-xs font-bold text-ide-accent">// Члени родини</span>
+                <button id="close-sidebar-btn" class="p-1 hover:bg-ide-panel rounded-lg text-ide-textMuted hover:text-ide-textBright">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <!-- Search Field -->
+            <div class="mb-4">
+                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">// search_by_name.sh</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-ide-textMuted">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </span>
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder="Введіть ПІБ..." 
+                        class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg pl-9 pr-4 py-2 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent focus:border-ide-accent transition-all placeholder-ide-textMuted/50"
+                    />
+                </div>
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <button id="add-person-btn" class="flex-grow bg-ide-accent text-ide-bg hover:bg-opacity-90 font-mono text-xs font-bold px-3 py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-md transition-all">
+                    <span>[+]</span>
+                    <span>Додати особу</span>
+                </button>
+                <button id="load-demo-btn" class="bg-ide-panel border border-ide-panelLight/60 text-ide-textBright hover:bg-ide-panelLight px-3 py-2.5 rounded-lg text-xs font-mono transition-all" title="Завантажити зразкове дерево">
+                    Демо
+                </button>
+            </div>
+
+            <!-- List of Persons -->
+            <div class="flex-grow overflow-y-auto border border-ide-panelLight/20 rounded-lg bg-ide-canvas/55">
+                <div id="people-list-container" class="p-2 space-y-1">
+                    <!-- Dynamic List Content -->
+                </div>
+            </div>
+
+            <!-- Clear Workspace Button -->
+            <button id="clear-all-btn" class="mt-4 text-[10px] font-mono font-bold text-red-400 hover:text-red-300 hover:bg-red-950/20 transition-all text-center uppercase tracking-wider block py-2 border border-dashed border-red-900/40 rounded-lg">
+                очистити_робочу_зону.sh
+            </button>
+        </aside>
+
+        <!-- Interactive Canvas Viewport -->
+        <main id="canvas-viewport" class="flex-grow overflow-hidden relative grid-bg cursor-grab select-none bg-ide-canvas">
+            
+            <!-- Mobile Toggle button for Sidebar -->
+            <button id="toggle-sidebar-btn" class="absolute top-4 left-4 lg:hidden bg-ide-panel/90 border border-ide-panelLight/40 text-ide-textBright hover:bg-ide-panelLight p-2.5 rounded-xl transition-all shadow-md z-10">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+
+            <!-- Floating Zoom Controls -->
+            <div class="absolute bottom-6 right-6 flex items-center gap-2 bg-ide-panel/90 backdrop-blur-md px-3 py-2 rounded-xl border border-ide-borderLight/40 shadow-xl z-20">
+                <button id="zoom-out-btn" class="w-7 h-7 rounded-lg bg-ide-canvas hover:bg-ide-panelLight border border-ide-borderLight/20 flex items-center justify-center font-mono font-bold text-ide-textBright hover:text-ide-accent transition-all">-</button>
+                <span id="zoom-value" class="text-[10px] font-mono font-bold text-ide-textMuted min-w-[36px] text-center">100%</span>
+                <button id="zoom-in-btn" class="w-7 h-7 rounded-lg bg-ide-canvas hover:bg-ide-panelLight border border-ide-borderLight/20 flex items-center justify-center font-mono font-bold text-ide-textBright hover:text-ide-accent transition-all">+</button>
+                <div class="w-px h-5 bg-ide-panelLight/40 mx-1"></div>
+                <button id="zoom-reset-btn" class="p-1.5 rounded-lg hover:bg-ide-panelLight text-ide-textMuted hover:text-ide-textBright transition-all" title="Центрувати">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                </button>
+            </div>
+
+            <!-- Movable Canvas Layer -->
+            <div id="tree-canvas" class="absolute origin-top-left flex flex-col items-center justify-center w-[4000px] h-[4000px] transition-transform duration-75 ease-out">
+                <!-- SVG Connections Layer -->
+                <svg id="svg-connections" class="absolute inset-0 w-full h-full pointer-events-none z-0">
+                    <defs>
+                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                    </defs>
+                </svg>
+
+                <!-- Cards Workspace -->
+                <div id="canvas-content" class="absolute inset-0 z-10">
+                    <!-- Cards are placed here absolutely at (x, y) -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Dialog (Editor) -->
+    <div id="editor-modal" class="fixed inset-0 bg-ide-bg/85 z-50 hidden items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-ide-panel rounded-2xl max-w-lg w-full shadow-2xl border border-ide-panelLight/30 flex flex-col overflow-hidden max-h-[95vh] scale-95 transition-transform duration-300" id="editor-modal-container">
+            
+            <div class="p-5 border-b border-ide-panelLight/40 bg-ide-canvas/40 flex justify-between items-center">
+                <h3 class="font-mono text-sm font-bold text-ide-accent flex items-center gap-2">
+                    <span>⚡</span>
+                    <span id="modal-title-text">Edit_Relation_Node.sh</span>
+                </h3>
+                <button id="close-modal-btn" class="text-ide-textMuted hover:text-ide-textBright text-xl font-bold p-1 rounded-lg hover:bg-ide-canvas transition-colors">
+                    &times;
+                </button>
+            </div>
+
+            <form id="person-form" class="p-6 overflow-y-auto space-y-4 max-h-[75vh]">
+                <input type="hidden" id="edit-person-id">
+                
+                <!-- Full Name Input -->
+                <div>
+                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">ПІБ (Прізвище, Ім'я, По батькові)*</label>
+                    <input 
+                        type="text" 
+                        id="edit-person-name"
+                        required
+                        placeholder="Введіть повне ім'я..."
+                        class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-4 py-2.5 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent focus:border-ide-accent transition-all placeholder-ide-textMuted/40"
+                    />
+                </div>
+
+                <!-- Occupation (Ким працювала людина) -->
+                <div>
+                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (Ким працювала)</label>
+                    <input 
+                        type="text" 
+                        id="edit-person-occupation"
+                        placeholder="напр. інженер, вчитель біології, агроном..."
+                        class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-4 py-2.5 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent focus:border-ide-accent transition-all placeholder-ide-textMuted/40"
+                    />
+                </div>
+
+                <!-- Gender and Dates -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Стать</label>
+                        <select 
+                            id="edit-person-gender"
+                            class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-3 py-2 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent transition-all"
+                        >
+                            <option value="male" class="bg-ide-panel">Чоловіча</option>
+                            <option value="female" class="bg-ide-panel">Жіноча</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Дата народження</label>
+                        <input 
+                            type="text" 
+                            id="edit-person-birth"
+                            placeholder="напр. 09.03.1814 або 1914"
+                            class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-3 py-2 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent transition-all placeholder-ide-textMuted/40"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Дата смерті</label>
+                        <input 
+                            type="text" 
+                            id="edit-person-death"
+                            placeholder="напр. 10.03.1861 (живе — пусто)"
+                            class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-3 py-2 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent transition-all placeholder-ide-textMuted/40"
+                        />
+                    </div>
+                </div>
+
+                <!-- Dynamic Relationship Manager -->
+                <div id="relations-manager-container" class="border border-ide-panelLight/30 py-3.5 px-4 bg-ide-canvas/30 rounded-xl space-y-3">
+                    <h4 class="text-[10px] font-mono font-bold text-ide-accent uppercase tracking-wider border-b border-ide-panelLight/20 pb-1.5">// Map_Relations_Config</h4>
+                    
+                    <!-- Form to add relation -->
+                    <div id="add-relation-form-block" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[9px] font-mono font-bold uppercase text-ide-textMuted mb-1">Оберіть родича з дерева</label>
+                                <select 
+                                    id="relation-target-select"
+                                    class="w-full bg-ide-canvas border border-ide-panelLight/30 rounded px-2 py-1.5 text-[11px] font-mono text-ide-textBright focus:outline-none focus:border-ide-accent transition-all"
+                                >
+                                    <option value="" class="bg-ide-panel">-- Оберіть особу --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-mono font-bold uppercase text-ide-textMuted mb-1">Зв'язок (ким є обрана особа для мене)</label>
+                                <select 
+                                    id="relation-type-select"
+                                    class="w-full bg-ide-canvas border border-ide-panelLight/30 rounded px-2 py-1.5 text-[11px] font-mono text-ide-textBright focus:outline-none focus:border-ide-accent transition-all"
+                                >
+                                    <option value="Батько" class="bg-ide-panel">Батько</option>
+                                    <option value="Мати" class="bg-ide-panel">Мати</option>
+                                    <option value="Чоловік" class="bg-ide-panel">Чоловік</option>
+                                    <option value="Дружина" class="bg-ide-panel">Дружина</option>
+                                    <option value="Син" class="bg-ide-panel">Син</option>
+                                    <option value="Дочка" class="bg-ide-panel">Дочка</option>
+                                    <option value="Брат" class="bg-ide-panel">Брат</option>
+                                    <option value="Сестра" class="bg-ide-panel">Сестра</option>
+                                    <option value="Дідусь" class="bg-ide-panel">Дідусь</option>
+                                    <option value="Бабуся" class="bg-ide-panel">Бабуся</option>
+                                    <option value="Дядько" class="bg-ide-panel">Дядько</option>
+                                    <option value="Тітка" class="bg-ide-panel">Тітка</option>
+                                    <option value="Племінник" class="bg-ide-panel">Племінник</option>
+                                    <option value="Племінниця" class="bg-ide-panel">Племінниця</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" id="btn-add-relation-item" class="w-full bg-ide-panelLight border border-ide-borderLight/80 hover:border-ide-accent text-ide-textBright text-[11px] font-mono py-1.5 rounded transition-all">
+                            + Встановити цей зв'язок
+                        </button>
+                    </div>
+
+                    <!-- Current active relations list -->
+                    <div class="space-y-1.5 pt-2">
+                        <span class="block text-[9px] font-mono font-bold uppercase text-ide-textMuted">// Поточні зв'язки цієї особи:</span>
+                        <div id="modal-active-relations-list" class="space-y-1 max-h-32 overflow-y-auto pr-1">
+                            <!-- Dynamic Active Relations Items -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Textarea -->
+                <div>
+                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Примітки (життєпис, важливі факти, досягнення)</label>
+                    <textarea 
+                        id="edit-person-notes"
+                        rows="3" 
+                        placeholder="Напишіть тут спогади, важливі життєві моменти або корисні історичні факти про вашого родича..."
+                        class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-4 py-2.5 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent focus:border-ide-accent transition-all placeholder-ide-textMuted/40"
+                    ></textarea>
+                </div>
+
+                <!-- Form Controls -->
+                <div class="flex justify-end gap-2 pt-4 border-t border-ide-panelLight/30">
+                    <button 
+                        type="button"
+                        id="cancel-modal-btn"
+                        class="bg-ide-canvas border border-ide-panelLight/40 hover:bg-ide-panelLight text-ide-textBright px-4 py-2.5 rounded-lg text-xs font-mono transition-colors"
+                    >
+                        Скасувати
+                    </button>
+                    <button 
+                        type="submit"
+                        class="bg-ide-accent text-ide-bg hover:bg-opacity-95 px-5 py-2.5 rounded-lg text-xs font-mono font-bold shadow-md transition-colors"
+                    >
+                        Зберегти зміни
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Dialog Modal -->
+    <div id="dialog-modal" class="fixed inset-0 bg-ide-bg/85 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-ide-panel rounded-xl max-w-sm w-full p-6 shadow-2xl border border-ide-panelLight/40 text-center space-y-4">
+            <span id="dialog-icon" class="text-3xl block">💡</span>
+            <h3 id="dialog-title" class="font-mono text-sm font-bold text-ide-accent">// Alert_Dialog</h3>
+            <p id="dialog-message" class="text-xs text-ide-textMuted leading-relaxed font-mono"></p>
+            <div class="flex items-center justify-center gap-2 pt-2" id="dialog-actions">
+                <!-- Action Buttons -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome / Onboarding Panel -->
+    <div id="onboarding-overlay" class="fixed inset-0 bg-[#090d16] z-[40] flex items-center justify-center p-6 overflow-y-auto">
+        <div class="max-w-xl w-full text-center space-y-6 py-6 border border-ide-panelLight/20 bg-ide-canvas/55 p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+            
+            <div class="space-y-2">
+                <span class="text-5xl animate-pulse block font-sans">🌿</span>
+                <h2 class="font-mono text-2xl font-bold text-ide-accent tracking-tight">// Ваша родинна хроніка</h2>
+                <p class="text-ide-textMuted text-xs max-w-md mx-auto leading-relaxed">
+                    Ласкаво просимо до вашої інтерактивної Родинної Хроніки. Створюйте картки та керуйте вашими даними, додавайте зв'язки та візуалізуйте історію вашої спадщини.
+                </p>
+            </div>
+
+            <!-- Start Options -->
+            <div class="space-y-4 relative">
+                <button id="onboard-start-btn" class="w-full flex items-center justify-between bg-ide-accent text-ide-bg hover:bg-opacity-95 p-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 group">
+                    <div class="text-left">
+                        <span class="font-mono font-bold text-xs block">[+] Розпочати заповнювати дані з початку</span>
+                        <span class="text-[10px] opacity-80 font-mono">Створити першу картку на порожньому полотні</span>
+                    </div>
+                    <span class="text-lg font-mono font-bold group-hover:translate-x-1 transition-transform">→</span>
+                </button>
+
+                <div id="onboard-drag-zone" class="border border-dashed border-ide-panelLight hover:border-ide-accent bg-ide-panel/30 hover:bg-ide-panel/50 p-6 rounded-xl transition-all text-center relative group overflow-hidden">
+                    <input type="file" id="onboard-import-file" accept=".json" class="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                    <span class="text-3xl mb-1 block group-hover:scale-105 transition-transform">📂</span>
+                    <span class="font-mono text-xs font-bold text-ide-textBright block mb-1">Імпортувати попередньо збережений файл</span>
+                    <span class="text-[9px] text-ide-textMuted font-mono">Перетягніть сюди файл .json або клікніть для вибору</span>
+                </div>
+            </div>
+
+            <p class="text-[15px] text-ide-textMuted/50 font-mono italic">
+                Всі дані зберігаються виключно у вашому браузері. Виконав Євген Москвяк за допомогою AI
+            </p>
+<p class="text-[11px] text-ide-textMuted/50 font-mono italic">
+    Зв'язатись зі мною: 
+    <a href="https://www.linkedin.com/in/evgen-moskvyak" 
+       target="_blank" 
+       class="text-ide-accent hover:underline underline-offset-2">
+       Linkedin
+    </a>
+</p>
+        </div>
+    </div>
+
+    <script>
+        let people = [];
+        let searchQuery = "";
+        let isExportEnabled = false; 
+        let activePersonId = null; 
+        let currentTheme = 'dark'; 
+
+        // Temporary relations array within Modal Session
+        let tempRelations = [];
+
+        // --- Zoom & Pan Coordinates ---
+        let zoomScale = 1.0;
+        let panX = 0;
+        let panY = 0;
+        let isPanning = false;
+        let panStartX, panStartY;
+
+        // --- Card Drag & Drop State ---
+        let draggingCard = null;
+        let dragOffset = { x: 0, y: 0 };
+
+        const CANVAS_CENTER_X = 2000;
+        const CANVAS_CENTER_Y = 2000;
+        const CARD_WIDTH = 224;  // Fixed uniform card width (w-56)
+        const CARD_HEIGHT = 150; // Fixed uniform card height
+
+        // --- DOM Elements ---
+        const searchInput = document.getElementById('search-input');
+        const peopleListContainer = document.getElementById('people-list-container');
+        const canvasViewport = document.getElementById('canvas-viewport');
+        const treeCanvas = document.getElementById('tree-canvas');
+        const canvasContent = document.getElementById('canvas-content');
+        const svgConnections = document.getElementById('svg-connections');
+        const editorModal = document.getElementById('editor-modal');
+        const editorModalContainer = document.getElementById('editor-modal-container');
+        const personForm = document.getElementById('person-form');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelModalBtn = document.getElementById('cancel-modal-btn');
+        const addPersonBtn = document.getElementById('add-person-btn');
+        const loadDemoBtn = document.getElementById('load-demo-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const importJsonInput = document.getElementById('import-json-input');
+        const exportJsonBtn = document.getElementById('export-json-btn');
+        
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const toolbarImportBtn = document.getElementById('toolbar-import-btn');
+
+        // Dialogs DOM
+        const dialogModal = document.getElementById('dialog-modal');
+        const dialogIcon = document.getElementById('dialog-icon');
+        const dialogTitle = document.getElementById('dialog-title');
+        const dialogMessage = document.getElementById('dialog-message');
+        const dialogActions = document.getElementById('dialog-actions');
+
+        // Sidebar mobile drawers
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        // Zoom controls DOM
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        const zoomResetBtn = document.getElementById('zoom-reset-btn');
+        const zoomValue = document.getElementById('zoom-value');
+
+        // Onboarding DOM
+        const onboardingOverlay = document.getElementById('onboarding-overlay');
+        const onboardStartBtn = document.getElementById('onboard-start-btn');
+        const onboardDragZone = document.getElementById('onboard-drag-zone');
+        const onboardImportFile = document.getElementById('onboard-import-file');
+
+        // Relation Manager DOM elements
+        const relationTargetSelect = document.getElementById('relation-target-select');
+        const relationTypeSelect = document.getElementById('relation-type-select');
+        const btnAddRelationItem = document.getElementById('btn-add-relation-item');
+        const modalActiveRelationsList = document.getElementById('modal-active-relations-list');
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (theme === 'light') {
+                body.classList.add('theme-light');
+                if (themeIcon) themeIcon.innerText = '🌙';
+                if (themeText) themeText.innerText = 'Темна тема';
+            } else {
+                body.classList.remove('theme-light');
+                if (themeIcon) themeIcon.innerText = '☀️';
+                if (themeText) themeText.innerText = 'Світла тема';
+            }
+            currentTheme = theme;
+            localStorage.setItem('family_tree_theme', theme);
+        }
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+        }
+
+        if (toolbarImportBtn) {
+            toolbarImportBtn.addEventListener('click', () => {
+                if (people.length > 0) {
+                    customConfirm(
+                        "Імпорт проекту",
+                        "Завантаження нового файлу повністю замінить поточну схему. Продовжити?",
+                        () => {
+                            importJsonInput.click();
+                        },
+                        '⚠️'
+                    );
+                } else {
+                    importJsonInput.click();
+                }
+            });
+        }
+
+        const demoDataset = [
+            { 
+                id: "1", 
+                name: "Шевченко Григорій Іванович", 
+                occupation: "Чумак / хлібороб", 
+                gender: "male", 
+                notes: "Батько Тараса Шевченка.", 
+                birthDate: "1781", 
+                deathDate: "1825", 
+                relations: [
+                    { personId: "2", type: "Дружина" },
+                    { personId: "3", type: "Син" }
+                ],
+                x: 1750, 
+                y: 1750 
+            },
+            { 
+                id: "2", 
+                name: "Шевченко Катерина Якимівна", 
+                occupation: "Домогосподарка", 
+                gender: "female", 
+                notes: "Мати Тараса Шевченка.", 
+                birthDate: "1783", 
+                deathDate: "1823", 
+                relations: [
+                    { personId: "1", type: "Чоловік" },
+                    { personId: "3", type: "Син" }
+                ],
+                x: 2050, 
+                y: 1750 
+            },
+            { 
+                id: "3", 
+                name: "Шевченко Тарас Григорович", 
+                occupation: "Поет / маляр / кобзар", 
+                gender: "male", 
+                notes: "Великий кобзар України.", 
+                birthDate: "09.03.1814", 
+                deathDate: "10.03.1861", 
+                relations: [
+                    { personId: "1", type: "Батько" },
+                    { personId: "2", type: "Мати" }
+                ],
+                x: 1900, 
+                y: 2050 
+            }
+        ];
+
+        function loadState() {
+            const saved = localStorage.getItem('family_tree_dragdrop_v3');
+            const savedExportStatus = localStorage.getItem('family_tree_dragdrop_export_v3');
+            if (saved) {
+                people = JSON.parse(saved);
+                onboardingOverlay.classList.add('hidden');
+            } else {
+                onboardingOverlay.classList.remove('hidden');
+            }
+
+            isExportEnabled = (savedExportStatus === 'true' && people.length > 0);
+            updateExportButtonsState();
+        }
+
+        function saveState() {
+            localStorage.setItem('family_tree_dragdrop_v3', JSON.stringify(people));
+            localStorage.setItem('family_tree_dragdrop_export_v3', isExportEnabled ? 'true' : 'false');
+            updateExportButtonsState();
+        }
+
+        function updateExportButtonsState() {
+            if (isExportEnabled && people.length > 0) {
+                exportJsonBtn.classList.remove('opacity-40', 'pointer-events-none', 'cursor-not-allowed');
+            } else {
+                exportJsonBtn.classList.add('opacity-40', 'pointer-events-none', 'cursor-not-allowed');
+            }
+        }
+
+        function triggerExportActivation() {
+            isExportEnabled = true;
+            saveState();
+        }
+
+        function customAlert(title, message, icon = '💡') {
+            dialogIcon.innerText = icon;
+            dialogTitle.innerText = title;
+            dialogMessage.innerText = message;
+            dialogActions.innerHTML = `
+                <button id="dialog-ok-btn" class="bg-ide-accent text-ide-bg px-6 py-2 rounded-lg text-xs font-mono font-bold hover:bg-opacity-90 transition-all">OK</button>
+            `;
+            dialogModal.classList.remove('hidden');
+            dialogModal.classList.add('flex');
+
+            document.getElementById('dialog-ok-btn').addEventListener('click', () => {
+                dialogModal.classList.add('hidden');
+                dialogModal.classList.remove('flex');
+            });
+        }
+
+        function customConfirm(title, message, onConfirm, icon = '❓') {
+            dialogIcon.innerText = icon;
+            dialogTitle.innerText = title;
+            dialogMessage.innerText = message;
+            dialogActions.innerHTML = `
+                <button id="dialog-cancel-btn" class="bg-ide-canvas border border-ide-panelLight/40 text-ide-textBright px-4 py-2 rounded-lg text-xs font-mono transition-all">Скасувати</button>
+                <button id="dialog-yes-btn" class="bg-red-500 text-ide-bg px-5 py-2 rounded-lg text-xs font-mono font-bold hover:bg-opacity-95 transition-all">Виконати</button>
+            `;
+            dialogModal.classList.remove('hidden');
+            dialogModal.classList.add('flex');
+
+            document.getElementById('dialog-cancel-btn').addEventListener('click', () => {
+                dialogModal.classList.add('hidden');
+                dialogModal.classList.remove('flex');
+            });
+
+            document.getElementById('dialog-yes-btn').addEventListener('click', () => {
+                dialogModal.classList.add('hidden');
+                dialogModal.classList.remove('flex');
+                onConfirm();
+            });
+        }
+
+        function applyCanvasTransform() {
+            treeCanvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`;
+            zoomValue.innerText = `${Math.round(zoomScale * 100)}%`;
+        }
+
+        function adjustZoom(amount) {
+            zoomScale = Math.min(Math.max(zoomScale + amount, 0.3), 2.0);
+            applyCanvasTransform();
+        }
+
+        function resetCanvasView() {
+            zoomScale = 1.0;
+            const viewRect = canvasViewport.getBoundingClientRect();
+            panX = (viewRect.width / 2) - CANVAS_CENTER_X;
+            panY = (viewRect.height / 2) - CANVAS_CENTER_Y;
+            applyCanvasTransform();
+        }
+
+        function setActivePerson(id) {
+            activePersonId = id;
+            document.querySelectorAll('.canvas-card-node').forEach(card => card.classList.remove('neon-active'));
+            document.querySelectorAll('.sidebar-person-item').forEach(item => {
+                item.classList.remove('bg-ide-panelLight/60', 'border-ide-accent');
+                item.classList.add('border-transparent');
+            });
+
+            if (!id) return;
+
+            const activeCard = document.querySelector(`.canvas-card-node[data-id="${id}"]`);
+            if (activeCard) activeCard.classList.add('neon-active');
+
+            const activeSidebarItem = document.querySelector(`.sidebar-person-item[data-id="${id}"]`);
+            if (activeSidebarItem) {
+                activeSidebarItem.classList.add('bg-ide-panelLight/60', 'border-ide-accent');
+                activeSidebarItem.classList.remove('border-transparent');
+                activeSidebarItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        canvasViewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('button') || e.target.closest('.card-body-node') || e.target.closest('form')) return;
+            isPanning = true;
+            canvasViewport.classList.replace('cursor-grab', 'cursor-grabbing');
+            panStartX = e.clientX - panX;
+            panStartY = e.clientY - panY;
+            setActivePerson(null); 
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isPanning) {
+                panX = e.clientX - panStartX;
+                panY = e.clientY - panStartY;
+                applyCanvasTransform();
+                return;
+            }
+
+            if (draggingCard) {
+                const mouseInCanvasX = (e.clientX - canvasViewport.getBoundingClientRect().left - panX) / zoomScale;
+                const mouseInCanvasY = (e.clientY - canvasViewport.getBoundingClientRect().top - panY) / zoomScale;
+                
+                let targetX = mouseInCanvasX - dragOffset.x;
+                let targetY = mouseInCanvasY - dragOffset.y;
+
+                targetX = Math.min(Math.max(0, targetX), 3800);
+                targetY = Math.min(Math.max(0, targetY), 3800);
+
+                const personId = draggingCard.getAttribute('data-id');
+                const personObj = people.find(p => p.id === personId);
+                if (personObj) {
+                    personObj.x = targetX;
+                    personObj.y = targetY;
+                    draggingCard.style.transform = `translate(${targetX}px, ${targetY}px)`;
+                    drawConnections();
+                }
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                canvasViewport.classList.replace('cursor-grabbing', 'cursor-grab');
+            }
+            if (draggingCard) {
+                draggingCard.classList.remove('z-50');
+                draggingCard = null;
+                triggerExportActivation();
+                saveState();
+            }
+        });
+
+        // Touch gestures
+        canvasViewport.addEventListener('touchstart', (e) => {
+            if (e.target.closest('button') || e.target.closest('.card-body-node')) return;
+            isPanning = true;
+            const touch = e.touches[0];
+            panStartX = touch.clientX - panX;
+            panStartY = touch.clientY - panY;
+        });
+
+        canvasViewport.addEventListener('touchmove', (e) => {
+            if (!isPanning) return;
+            const touch = e.touches[0];
+            panX = touch.clientX - panStartX;
+            panY = touch.clientY - panStartY;
+            applyCanvasTransform();
+        });
+
+        canvasViewport.addEventListener('touchend', () => { isPanning = false; });
+        canvasViewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.05 : 0.05;
+            adjustZoom(delta);
+        }, { passive: false });
+
+        zoomInBtn.addEventListener('click', () => adjustZoom(0.1));
+        zoomOutBtn.addEventListener('click', () => adjustZoom(-0.1));
+        zoomResetBtn.addEventListener('click', resetCanvasView);
+
+        toggleSidebarBtn.addEventListener('click', () => sidebar.classList.remove('-translate-x-full'));
+        closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('-translate-x-full'));
+
+        function getRelationColor(type) {
+            switch (type) {
+                case "Батько":
+                case "Мати":
+                case "Дідусь":
+                case "Бабуся":
+                    return "#10b981"; // Emerald green
+                case "Чоловік":
+                case "Дружина":
+                    return "#eab308"; // Amber yellow
+                case "Син":
+                case "Дочка":
+                case "Племінник":
+                case "Племінниця":
+                    return "#3b82f6"; // Blue
+                case "Брат":
+                case "Сестра":
+                    return "#a855f7"; // Purple
+                default:
+                    return "#06b6d4"; // Cyan for custom or other relations
+            }
+        }
+
+        function drawConnections() {
+            svgConnections.innerHTML = "";
+            const cardWidth = CARD_WIDTH;  
+            const cardHeight = CARD_HEIGHT; 
+            
+            // To prevent duplicate lines for same pair of nodes of same type, track drew relations
+            const processedPairs = new Set();
+
+            people.forEach(person => {
+                const startNode = document.querySelector(`[data-id="${person.id}"]`);
+                if (!startNode || !person.relations) return;
+
+                const startX = person.x + (cardWidth / 2);
+                const startY = person.y + (cardHeight / 2);
+
+                person.relations.forEach(rel => {
+                    const target = people.find(p => p.id === rel.personId);
+                    if (!target) return;
+
+                    const endX = target.x + (cardWidth / 2);
+                    const endY = target.y + (cardHeight / 2);
+
+                    // Generate a unique key for the pair
+                    const pairKey = [person.id, target.id].sort().join('-') + '-' + rel.type;
+                    if (processedPairs.has(pairKey)) return;
+                    processedPairs.add(pairKey);
+
+                    // Color lines based on relationship type
+                    const strokeColor = getRelationColor(rel.type);
+                    const isSpouse = (rel.type === "Чоловік" || rel.type === "Дружина");
+
+                    // Create the Connection line
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", startX);
+                    line.setAttribute("y1", startY);
+                    line.setAttribute("x2", endX);
+                    line.setAttribute("y2", endY);
+                    line.setAttribute("stroke", strokeColor);
+                    line.setAttribute("stroke-width", "2.5");
+                    if (isSpouse) {
+                        line.setAttribute("stroke-dasharray", "5 5");
+                    }
+                    line.setAttribute("filter", "url(#glow)");
+                    line.setAttribute("opacity", "0.65");
+                    svgConnections.appendChild(line);
+
+                    // Create Relationship Text Badge along the connection
+                    const midX = (startX + endX) / 2;
+                    const midY = (startY + endY) / 2;
+
+                    // Container of text to keep it stylized and readable
+                    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    
+                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                    rect.setAttribute("x", midX - 35);
+                    rect.setAttribute("y", midY - 9);
+                    rect.setAttribute("width", "70");
+                    rect.setAttribute("height", "18");
+                    rect.setAttribute("rx", "5");
+                    rect.setAttribute("fill", currentTheme === 'light' ? '#fafafa' : '#090d16');
+                    rect.setAttribute("stroke", strokeColor);
+                    rect.setAttribute("stroke-width", "1");
+                    rect.setAttribute("opacity", "0.9");
+
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", midX);
+                    text.setAttribute("y", midY + 4);
+                    text.setAttribute("fill", currentTheme === 'light' ? '#18181b' : '#f8fafc');
+                    text.setAttribute("font-size", "9px");
+                    text.setAttribute("font-family", "JetBrains Mono, monospace");
+                    text.setAttribute("text-anchor", "middle");
+                    text.textContent = rel.type;
+
+                    group.appendChild(rect);
+                    group.appendChild(text);
+                    svgConnections.appendChild(group);
+                });
+            });
+        }
+
+        function renderSidebar() {
+            peopleListContainer.innerHTML = "";
+            const filtered = people.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+            if (filtered.length === 0) {
+                peopleListContainer.innerHTML = `<p class="text-[10px] font-mono text-ide-textMuted text-center py-8">// no_records_found</p>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const isSelected = p.id === activePersonId;
+                const borderClass = isSelected ? 'border-ide-accent bg-ide-panelLight/60' : 'border-transparent';
+                
+                const div = document.createElement('div');
+                div.className = `sidebar-person-item p-3 cursor-pointer rounded-xl border ${borderClass} bg-ide-panel/40 hover:bg-ide-panelLight/30 transition-all flex items-center justify-between group`;
+                div.setAttribute('data-id', p.id);
+
+                const genderIcon = p.gender === 'male' ? '👨' : '👩';
+
+                div.innerHTML = `
+                    <div class="min-w-0 pr-2 flex-grow">
+                        <p class="font-mono text-xs truncate text-ide-textBright flex items-center">
+                            <span class="mr-1">${genderIcon}</span>
+                            <span class="truncate">${p.name}</span>
+                        </p>
+                        <p class="text-[9px] font-mono text-ide-textMuted mt-0.5">${p.birthDate || '????'}${p.deathDate ? ` — ${p.deathDate}` : ''}</p>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                        <button class="focus-btn-sidebar p-1 hover:bg-ide-panel rounded text-ide-accent" data-id="${p.id}" title="Знайти на карті">🔍</button>
+                        <button class="edit-btn-sidebar p-1 hover:bg-ide-panel rounded text-ide-textMuted hover:text-ide-textBright" data-id="${p.id}" title="Редагувати">📝</button>
+                        <button class="delete-btn-sidebar p-1 hover:bg-red-950/40 rounded text-ide-textMuted hover:text-red-400" data-id="${p.id}" title="Видалити">🗑️</button>
+                    </div>
+                `;
+
+                div.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    setActivePerson(p.id);
+                    centerOnNode(p.id);
+                });
+
+                peopleListContainer.appendChild(div);
+            });
+
+            document.querySelectorAll('.focus-btn-sidebar').forEach(btn => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); setActivePerson(btn.getAttribute('data-id')); centerOnNode(btn.getAttribute('data-id')); });
+            });
+            document.querySelectorAll('.edit-btn-sidebar').forEach(btn => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); openEditor(btn.getAttribute('data-id')); });
+            });
+            document.querySelectorAll('.delete-btn-sidebar').forEach(btn => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); deletePerson(btn.getAttribute('data-id')); });
+            });
+        }
+
+        function centerOnNode(nodeId) {
+            const person = people.find(p => p.id === nodeId);
+            if (person) {
+                const viewRect = canvasViewport.getBoundingClientRect();
+                panX = (viewRect.width / 2) - (person.x + (CARD_WIDTH / 2)) * zoomScale;
+                panY = (viewRect.height / 2) - (person.y + (CARD_HEIGHT / 2)) * zoomScale;
+                applyCanvasTransform();
+            }
+        }
+
+        function renderCanvasNodes() {
+            canvasContent.innerHTML = "";
+            
+            if (people.length === 0) {
+                canvasContent.innerHTML = `
+                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center max-w-md p-10 border border-ide-panelLight/30 bg-ide-panel rounded-3xl shadow-2xl">
+                        <span class="text-5xl animate-bounce duration-1000 block mb-4">🌳</span>
+                        <h3 class="font-mono text-sm font-bold text-ide-accent mb-2">// space_is_empty</h3>
+                        <p class="text-xs text-ide-textMuted leading-relaxed font-mono mb-6">Ваше дерево порожнє. Натисніть кнопку нижче, щоб додати першу картку.</p>
+                        <button id="canvas-empty-btn" class="w-full bg-ide-accent text-ide-bg hover:bg-opacity-95 font-mono text-xs font-bold px-4 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md">
+                            <span>[+] Створити вузол</span>
+                        </button>
+                    </div>
+                `;
+                document.getElementById('canvas-empty-btn')?.addEventListener('click', () => openEditor());
+                svgConnections.innerHTML = "";
+                return;
+            }
+
+            people.forEach(person => {
+                const isSelected = person.id === activePersonId;
+                const activeClasses = isSelected ? 'neon-active' : '';
+
+                const card = document.createElement('div');
+                card.className = `canvas-card-node absolute w-56 h-[150px] bg-ide-panel border border-ide-panelLight/40 rounded-xl shadow-lg flex flex-col cursor-grab select-none transition-shadow overflow-hidden ${activeClasses}`;
+                card.style.transform = `translate(${person.x}px, ${person.y}px)`;
+                card.setAttribute('data-id', person.id);
+
+                const genderBorder = person.gender === 'male' ? 'border-t-ide-male' : 'border-t-ide-female';
+                const genderIcon = person.gender === 'male' ? '👨' : '👩';
+
+                card.innerHTML = `
+                    <div class="h-1 w-full rounded-t-xl border-t-2 ${genderBorder}"></div>
+                    
+                    <div class="card-body-node p-3 flex-grow flex flex-col items-center text-center justify-between overflow-hidden">
+                        <div class="flex items-center gap-1.5 justify-center w-full">
+                            <span class="text-lg">${genderIcon}</span>
+                        </div>
+                        <h4 class="font-mono font-bold text-xs text-ide-textBright hover:text-ide-accent cursor-pointer line-clamp-2 leading-snug w-full">
+                            ${person.name}
+                        </h4>
+                        <p class="text-[9px] text-ide-textMuted font-mono">
+                            ${person.birthDate || '????'}${person.deathDate ? ` — ${person.deathDate}` : ' (живе)'}
+                        </p>
+                        ${person.occupation ? `
+                            <p class="text-[8px] font-mono text-ide-accent bg-ide-canvas/60 px-1.5 py-0.5 rounded-md max-w-full truncate">
+                                💼 ${person.occupation}
+                            </p>
+                        ` : ''}
+                        ${person.notes ? `
+                            <p class="text-[8px] font-mono text-ide-textMuted italic line-clamp-1 max-w-full border-t border-dashed border-ide-panelLight/40 pt-1 w-full">
+                                # ${person.notes}
+                            </p>
+                        ` : ''}
+                    </div>
+
+                    <!-- Clean simple footer with only delete action -->
+                    <div class="bg-ide-canvas/50 border-t border-ide-panelLight/20 px-3 py-1.5 flex justify-end items-center shrink-0">
+                        <button class="quick-del-btn text-red-400 hover:text-red-500 font-mono text-[10px] font-bold" data-id="${person.id}">Видалити (X)</button>
+                    </div>
+                `;
+
+                // Set drag start coordinate offset
+                card.addEventListener('mousedown', (e) => {
+                    if (e.target.closest('button')) return;
+                    e.stopPropagation();
+                    draggingCard = card;
+                    card.classList.add('z-50');
+
+                    setActivePerson(person.id);
+
+                    const bounds = card.getBoundingClientRect();
+                    dragOffset.x = (e.clientX - bounds.left) / zoomScale;
+                    dragOffset.y = (e.clientY - bounds.top) / zoomScale;
+                });
+
+                // Double click interaction triggers editor
+                card.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    openEditor(person.id);
+                });
+
+                canvasContent.appendChild(card);
+            });
+
+            document.querySelectorAll('.quick-del-btn').forEach(b => {
+                b.addEventListener('click', (e) => { e.stopPropagation(); deletePerson(b.getAttribute('data-id')); });
+            });
+
+            drawConnections();
+        }
+
+        function deletePerson(id) {
+            const p = people.find(x => x.id === id);
+            customConfirm(
+                "Видалення вузла", 
+                `Ви дійсно хочете видалити ${p.name}? Всі існуючі зв'язки з цією особою будуть анульовані.`, 
+                () => {
+                    // Remove person and cleanup their relationships inside other nodes
+                    people = people.filter(item => item.id !== id).map(item => {
+                        let updated = { ...item };
+                        if (updated.relations) {
+                            updated.relations = updated.relations.filter(r => r.personId !== id);
+                        }
+                        return updated;
+                    });
+                    
+                    if (activePersonId === id) activePersonId = null;
+                    triggerExportActivation(); 
+                    saveState();
+                    renderSidebar();
+                    renderCanvasNodes();
+                },
+                '🗑️'
+            );
+        }
+
+        function openEditor(personId = null) {
+            populateRelationTargetsDropdown(personId);
+
+            if (personId) {
+                const person = people.find(p => p.id === personId);
+                document.getElementById('modal-title-text').innerText = "Edit_Relation_Node.sh";
+                document.getElementById('edit-person-id').value = person.id;
+                document.getElementById('edit-person-name').value = person.name || '';
+                document.getElementById('edit-person-occupation').value = person.occupation || '';
+                document.getElementById('edit-person-gender').value = person.gender || 'male';
+                document.getElementById('edit-person-birth').value = person.birthDate || '';
+                document.getElementById('edit-person-death').value = person.deathDate || '';
+                document.getElementById('edit-person-notes').value = person.notes || '';
+
+                // Copy real relationships to temporary array
+                tempRelations = person.relations ? JSON.parse(JSON.stringify(person.relations)) : [];
+                document.getElementById('relations-manager-container').classList.remove('hidden');
+            } else {
+                document.getElementById('modal-title-text').innerText = "Create_Relation_Node.sh";
+                document.getElementById('edit-person-id').value = Date.now().toString();
+                document.getElementById('edit-person-name').value = '';
+                document.getElementById('edit-person-occupation').value = '';
+                document.getElementById('edit-person-gender').value = 'male';
+                document.getElementById('edit-person-birth').value = '';
+                document.getElementById('edit-person-death').value = '';
+                document.getElementById('edit-person-notes').value = '';
+
+                // Empty state for relations when creating a card
+                tempRelations = [];
+                document.getElementById('relations-manager-container').classList.add('hidden'); // Hide relation manager on first creation
+            }
+
+            renderTempRelationsList();
+            editorModal.classList.remove('hidden');
+            editorModal.classList.add('flex');
+            setTimeout(() => {
+                editorModalContainer.classList.replace('scale-95', 'scale-100');
+            }, 10);
+        }
+
+        // Populate Target Person Dropdown for relations Setup
+        function populateRelationTargetsDropdown(excludeId = null) {
+            relationTargetSelect.innerHTML = '<option value="" class="bg-ide-panel">-- Оберіть особу --</option>';
+            people.forEach(p => {
+                if (p.id === excludeId) return;
+                relationTargetSelect.innerHTML += `<option value="${p.id}" class="bg-ide-panel">${p.name}</option>`;
+            });
+        }
+
+        // Render Active temporary relations inside edit modal
+        function renderTempRelationsList() {
+            modalActiveRelationsList.innerHTML = "";
+            if (tempRelations.length === 0) {
+                modalActiveRelationsList.innerHTML = `<p class="text-[9px] font-mono text-ide-textMuted italic">// Зв'язків не встановлено</p>`;
+                return;
+            }
+
+            tempRelations.forEach((r, idx) => {
+                const targetObj = people.find(p => p.id === r.personId);
+                const targetName = targetObj ? targetObj.name : "Невідома особа";
+
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-ide-canvas/50 px-2.5 py-1 rounded border border-ide-borderLight/30 text-[10px] font-mono";
+                div.innerHTML = `
+                    <span class="truncate text-ide-textBright">${targetName} <span class="text-ide-accent">(${r.type})</span></span>
+                    <button type="button" class="btn-remove-temp-relation text-red-400 hover:text-red-300 ml-2 font-bold" data-index="${idx}">&times;</button>
+                `;
+                modalActiveRelationsList.appendChild(div);
+            });
+
+            // Bind remove triggers
+            document.querySelectorAll('.btn-remove-temp-relation').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(btn.getAttribute('data-index'));
+                    tempRelations.splice(idx, 1);
+                    renderTempRelationsList();
+                });
+            });
+        }
+
+        // Add relationship button handler
+        btnAddRelationItem.addEventListener('click', () => {
+            const targetId = relationTargetSelect.value;
+            const relType = relationTypeSelect.value;
+
+            if (!targetId) {
+                customAlert("Помилка зв'язку", "Будь ласка, оберіть особу з випадаючого списку.", '⚠️');
+                return;
+            }
+
+            // Check if already exists in temporary list
+            if (tempRelations.some(r => r.personId === targetId)) {
+                customAlert("Дублікат зв'язку", "Ви вже встановили зв'язок із цією особою.", '⚠️');
+                return;
+            }
+
+            // Push to modal temporary relations state
+            tempRelations.push({ personId: targetId, type: relType });
+            renderTempRelationsList();
+        });
+
+        function closeModal() {
+            editorModalContainer.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => {
+                editorModal.classList.add('hidden');
+                editorModal.classList.remove('flex');
+            }, 150);
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelModalBtn.addEventListener('click', closeModal);
+
+        personForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const targetId = document.getElementById('edit-person-id').value;
+            const existingIdx = people.findIndex(p => p.id === targetId);
+
+            let calculatedX = CANVAS_CENTER_X - (CARD_WIDTH / 2); 
+            let calculatedY = CANVAS_CENTER_Y - (CARD_HEIGHT / 2);
+
+            if (existingIdx > -1) {
+                calculatedX = people[existingIdx].x;
+                calculatedY = people[existingIdx].y;
+            } else if (people.length > 0) {
+                calculatedX = people[0].x + 250;
+                calculatedY = people[0].y + (people.length % 2 === 0 ? 100 : -100);
+            }
+
+            const savedPerson = {
+                id: targetId,
+                name: document.getElementById('edit-person-name').value,
+                occupation: document.getElementById('edit-person-occupation').value,
+                gender: document.getElementById('edit-person-gender').value,
+                notes: document.getElementById('edit-person-notes').value,
+                birthDate: document.getElementById('edit-person-birth').value,
+                deathDate: document.getElementById('edit-person-death').value,
+                relations: tempRelations, // Save active relationships configured
+                x: calculatedX,
+                y: calculatedY
+            };
+
+            if (existingIdx > -1) {
+                people[existingIdx] = savedPerson;
+            } else {
+                people.push(savedPerson);
+            }
+
+            // Sync reciprocal connections automatically to ensure drawing coherence
+            savedPerson.relations.forEach(rel => {
+                const targetObj = people.find(p => p.id === rel.personId);
+                if (targetObj) {
+                    if (!targetObj.relations) targetObj.relations = [];
+                    // Ensure the target person has a link back if it doesn't already exist
+                    if (!targetObj.relations.some(r => r.personId === savedPerson.id)) {
+                        // Find reciprocal relationship title
+                        let reciprocalType = rel.type;
+                        if (rel.type === "Батько" || rel.type === "Мати") {
+                            reciprocalType = targetObj.gender === "male" ? "Син" : "Дочка";
+                        } else if (rel.type === "Чоловік") {
+                            reciprocalType = "Дружина";
+                        } else if (rel.type === "Дружина") {
+                            reciprocalType = "Чоловік";
+                        } else if (rel.type === "Син" || rel.type === "Дочка") {
+                            reciprocalType = targetObj.gender === "male" ? "Батько" : "Мати";
+                        } else if (rel.type === "Брат") {
+                            reciprocalType = targetObj.gender === "male" ? "Брат" : "Сестра";
+                        } else if (rel.type === "Сестра") {
+                            reciprocalType = targetObj.gender === "male" ? "Брат" : "Сестра";
+                        }
+                        
+                        targetObj.relations.push({ personId: savedPerson.id, type: reciprocalType });
+                    }
+                }
+            });
+
+            triggerExportActivation(); 
+            saveState();
+            renderSidebar();
+            renderCanvasNodes();
+            closeModal();
+            setActivePerson(savedPerson.id);
+            centerOnNode(savedPerson.id);
+        });
+
+        function executeImportProcess(rawText) {
+            try {
+                const parsed = JSON.parse(rawText);
+                if (Array.isArray(parsed)) {
+                    people = parsed.map((p, idx) => {
+                        if (typeof p.x === 'undefined' || typeof p.y === 'undefined') {
+                            p.x = CANVAS_CENTER_X + (idx % 3 === 0 ? -300 : idx % 3 === 1 ? 0 : 300);
+                            p.y = CANVAS_CENTER_Y + (Math.floor(idx / 3) * 200);
+                        }
+                        return p;
+                    });
+                    
+                    triggerExportActivation(); 
+                    onboardingOverlay.classList.add('hidden'); 
+                    
+                    saveState();
+                    renderSidebar();
+                    renderCanvasNodes();
+                    resetCanvasView();
+                    customAlert("Імпорт завершено", "Проект родинної хроніки успішно імпортовано та відновлено!", '🎉');
+                } else {
+                    customAlert("Помилка парсингу", "Файл не містить сумісних даних.");
+                }
+            } catch (err) {
+                customAlert("Помилка імпорту", "Пошкоджений або некоректний JSON формат.");
+            }
+        }
+
+        onboardImportFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => executeImportProcess(ev.target.result);
+            reader.readAsText(file);
+        });
+
+        importJsonInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => executeImportProcess(ev.target.result);
+            reader.readAsText(file);
+        });
+
+        onboardDragZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            onboardDragZone.classList.add('border-ide-accent', 'bg-ide-panel/80');
+        });
+
+        onboardDragZone.addEventListener('dragleave', () => {
+            onboardDragZone.classList.remove('border-ide-accent', 'bg-ide-panel/80');
+        });
+
+        onboardDragZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            onboardDragZone.classList.remove('border-ide-accent', 'bg-ide-panel/80');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === "application/json") {
+                const reader = new FileReader();
+                reader.onload = ev => executeImportProcess(ev.target.result);
+                reader.readAsText(file);
+            } else {
+                customAlert("Невірний тип", "Очікується виключно файл .json.");
+            }
+        });
+
+        onboardStartBtn.addEventListener('click', () => {
+            people = [];
+            onboardingOverlay.classList.add('hidden');
+            saveState();
+            renderSidebar();
+            renderCanvasNodes();
+            resetCanvasView();
+            openEditor(); 
+        });
+
+        addPersonBtn.addEventListener('click', () => openEditor());
+
+        loadDemoBtn.addEventListener('click', () => {
+            customConfirm(
+                "Завантажити демо",
+                "Це завантажить дерево родини Т. Г. Шевченка з готовими координатами та зв'язками. Поточні зміни буде втрачено.",
+                () => {
+                    people = JSON.parse(JSON.stringify(demoDataset));
+                    triggerExportActivation();
+                    saveState();
+                    renderSidebar();
+                    renderCanvasNodes();
+                    resetCanvasView();
+                },
+                '🌿'
+            );
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            customConfirm(
+                "Очистити робочу зону", 
+                "Ви дійсно бажаєте безповоротно видалити всю поточну хроніку і почати проект з чистого аркуша?", 
+                () => {
+                    people = [];
+                    isExportEnabled = false; 
+                    activePersonId = null;
+                    saveState();
+                    renderSidebar();
+                    renderCanvasNodes();
+                    onboardingOverlay.classList.remove('hidden'); 
+                },
+                '⚠️'
+            );
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderSidebar();
+        });
+
+        exportJsonBtn.addEventListener('click', () => {
+            if (!isExportEnabled || people.length === 0) return;
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(people, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `family-tree-${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        });
+
+        window.onload = function () {
+            applyTheme(localStorage.getItem('family_tree_theme') || 'dark');
+            loadState();
+            renderSidebar();
+            renderCanvasNodes();
+            resetCanvasView();
+        }
+    </script>
+</body>
+</html>
