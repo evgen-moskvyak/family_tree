@@ -119,7 +119,7 @@
             </div>
             <div>
                 <h1 class="font-mono text-lg font-bold tracking-tight text-ide-textBright flex items-center gap-2">
-                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">NODE v4.0</span>
+                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.1 від 27.06.26</span>
                 </h1>
                 <p class="text-[10px] text-ide-textMuted font-mono uppercase tracking-wider">Генеалогічна схема з інтерактивним перетягуванням та визначенням зв'язків</p>
             </div>
@@ -184,7 +184,7 @@
                     <span>Додати особу</span>
                 </button>
                 <button id="load-demo-btn" class="bg-ide-panel border border-ide-panelLight/60 text-ide-textBright hover:bg-ide-panelLight px-3 py-2.5 rounded-lg text-xs font-mono transition-all" title="Завантажити зразкове дерево">
-                    Демо
+                    Тестовий приклад
                 </button>
             </div>
 
@@ -271,7 +271,7 @@
 
                 <!-- Occupation (Ким працювала людина) -->
                 <div>
-                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (Ким людина працювала)</label>
+                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (Ким працювала людина)</label>
                     <input 
                         type="text" 
                         id="edit-person-occupation"
@@ -306,7 +306,7 @@
                         <input 
                             type="text" 
                             id="edit-person-death"
-                            placeholder="напр. 10.03.1861 (живе — пусто)"
+                            placeholder="напр. 10.03.1861 (якщо живий/жива — пусто)"
                             class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-3 py-2 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent transition-all placeholder-ide-textMuted/40"
                         />
                     </div>
@@ -400,7 +400,7 @@
     <div id="dialog-modal" class="fixed inset-0 bg-ide-bg/85 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-ide-panel rounded-xl max-w-sm w-full p-6 shadow-2xl border border-ide-panelLight/40 text-center space-y-4">
             <span id="dialog-icon" class="text-3xl block">💡</span>
-            <h3 id="dialog-title" class="font-mono text-sm font-bold text-ide-accent">// Alert_Dialog</h3>
+            <h3 id="dialog-title" class="font-mono text-sm font-bold text-ide-accent">Alert_Dialog</h3>
             <p id="dialog-message" class="text-xs text-ide-textMuted leading-relaxed font-mono"></p>
             <div class="flex items-center justify-center gap-2 pt-2" id="dialog-actions">
                 <!-- Action Buttons -->
@@ -1301,7 +1301,7 @@
                     resetCanvasView();
                     customAlert("Імпорт завершено", "Проект родинної хроніки успішно імпортовано та відновлено!", '🎉');
                 } else {
-                    customAlert("Помилка парсингу", "Файл не містить сумісних даних.");
+                    customAlert("Помилка імпорту", "Файл не містить сумісних даних.");
                 }
             } catch (err) {
                 customAlert("Помилка імпорту", "Пошкоджений або некоректний JSON формат.");
@@ -1360,7 +1360,7 @@
 
         loadDemoBtn.addEventListener('click', () => {
             customConfirm(
-                "Завантажити демо",
+                "Завантажити демо приклад",
                 "Це завантажить дерево родини Т. Г. Шевченка з готовими координатами та зв'язками. Поточні зміни буде втрачено.",
                 () => {
                     people = JSON.parse(JSON.stringify(demoDataset));
