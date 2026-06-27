@@ -138,7 +138,7 @@
             <!-- Кнопка швидкого імпорту в робочій області із попередженням -->
             <button id="toolbar-import-btn" class="bg-ide-panel border border-ide-borderLight/40 hover:border-ide-accent text-ide-textBright hover:bg-ide-panelLight px-3.5 py-2 rounded-lg text-xs font-mono transition-all flex items-center gap-2 shadow-sm" title="Імпортувати збережений файл JSON">
                 <span class="text-ide-accent">📂</span>
-                <span>Імпорт проекту (JSON)</span>
+                <span>Імпорт файлу (JSON)</span>
             </button>
 
             <!-- Кнопка збереження проекту -->
@@ -164,7 +164,7 @@
 
             <!-- Search Field -->
             <div class="mb-4">
-                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">// search_by_name.sh</label>
+                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">// Виконати пошук</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-ide-textMuted">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -197,7 +197,7 @@
 
             <!-- Clear Workspace Button -->
             <button id="clear-all-btn" class="mt-4 text-[10px] font-mono font-bold text-red-400 hover:text-red-300 hover:bg-red-950/20 transition-all text-center uppercase tracking-wider block py-2 border border-dashed border-red-900/40 rounded-lg">
-                очистити_робочу_зону.sh
+                очистити робочу зону
             </button>
         </aside>
 
@@ -247,7 +247,7 @@
             <div class="p-5 border-b border-ide-panelLight/40 bg-ide-canvas/40 flex justify-between items-center">
                 <h3 class="font-mono text-sm font-bold text-ide-accent flex items-center gap-2">
                     <span>⚡</span>
-                    <span id="modal-title-text">Edit_Relation_Node.sh</span>
+                    <span id="modal-title-text">Редагування картки</span>
                 </h3>
                 <button id="close-modal-btn" class="text-ide-textMuted hover:text-ide-textBright text-xl font-bold p-1 rounded-lg hover:bg-ide-canvas transition-colors">
                     &times;
@@ -271,7 +271,7 @@
 
                 <!-- Occupation (Ким працювала людина) -->
                 <div>
-                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (Ким працювала)</label>
+                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (Ким людина працювала)</label>
                     <input 
                         type="text" 
                         id="edit-person-occupation"
@@ -293,7 +293,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Дата народження</label>
+                        <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Рік життя від</label>
                         <input 
                             type="text" 
                             id="edit-person-birth"
@@ -302,7 +302,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Дата смерті</label>
+                        <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Рік життя по</label>
                         <input 
                             type="text" 
                             id="edit-person-death"
@@ -314,7 +314,7 @@
 
                 <!-- Dynamic Relationship Manager -->
                 <div id="relations-manager-container" class="border border-ide-panelLight/30 py-3.5 px-4 bg-ide-canvas/30 rounded-xl space-y-3">
-                    <h4 class="text-[10px] font-mono font-bold text-ide-accent uppercase tracking-wider border-b border-ide-panelLight/20 pb-1.5">// Map_Relations_Config</h4>
+                    <h4 class="text-[10px] font-mono font-bold text-ide-accent uppercase tracking-wider border-b border-ide-panelLight/20 pb-1.5">Редагування зв'язку</h4>
                     
                     <!-- Form to add relation -->
                     <div id="add-relation-form-block" class="space-y-3">
@@ -919,7 +919,7 @@
             const filtered = people.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
             if (filtered.length === 0) {
-                peopleListContainer.innerHTML = `<p class="text-[10px] font-mono text-ide-textMuted text-center py-8">// no_records_found</p>`;
+                peopleListContainer.innerHTML = `<p class="text-[10px] font-mono text-ide-textMuted text-center py-8">Ви ще створили список</p>`;
                 return;
             }
 
@@ -985,7 +985,7 @@
                 canvasContent.innerHTML = `
                     <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center max-w-md p-10 border border-ide-panelLight/30 bg-ide-panel rounded-3xl shadow-2xl">
                         <span class="text-5xl animate-bounce duration-1000 block mb-4">🌳</span>
-                        <h3 class="font-mono text-sm font-bold text-ide-accent mb-2">// space_is_empty</h3>
+                        <h3 class="font-mono text-sm font-bold text-ide-accent mb-2">Робоча зона пуста</h3>
                         <p class="text-xs text-ide-textMuted leading-relaxed font-mono mb-6">Ваше дерево порожнє. Натисніть кнопку нижче, щоб додати першу картку.</p>
                         <button id="canvas-empty-btn" class="w-full bg-ide-accent text-ide-bg hover:bg-opacity-95 font-mono text-xs font-bold px-4 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md">
                             <span>[+] Створити вузол</span>
@@ -1100,7 +1100,7 @@
 
             if (personId) {
                 const person = people.find(p => p.id === personId);
-                document.getElementById('modal-title-text').innerText = "Edit_Relation_Node.sh";
+                document.getElementById('modal-title-text').innerText = "Редагування картки";
                 document.getElementById('edit-person-id').value = person.id;
                 document.getElementById('edit-person-name').value = person.name || '';
                 document.getElementById('edit-person-occupation').value = person.occupation || '';
