@@ -919,7 +919,7 @@
             const filtered = people.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
             if (filtered.length === 0) {
-                peopleListContainer.innerHTML = `<p class="text-[10px] font-mono text-ide-textMuted text-center py-8">Ви ще створили список</p>`;
+                peopleListContainer.innerHTML = `<p class="text-[10px] font-mono text-ide-textMuted text-center py-8">Ви ще не створили список</p>`;
                 return;
             }
 
