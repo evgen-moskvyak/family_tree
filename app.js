@@ -279,7 +279,9 @@ window.addEventListener('mousemove', (e) => {
             personObj.x = targetX;
             personObj.y = targetY;
             draggingCard.style.transform = `translate(${targetX}px, ${targetY}px)`;
-            drawConnections();
+            
+            // Миттєве оновлення ліній під час руху миші
+            requestAnimationFrame(drawConnections);
         }
     }
 });
@@ -294,6 +296,7 @@ window.addEventListener('mouseup', () => {
         draggingCard = null;
         triggerExportActivation();
         saveState();
+        drawConnections(); 
     }
 });
 
@@ -350,7 +353,7 @@ function drawConnections() {
             line.setAttribute("stroke-width", "2.5");
             if (isSpouse) line.setAttribute("stroke-dasharray", "5 5");
             line.setAttribute("filter", "url(#glow)");
-            line.setAttribute("opacity", "0.65");
+            line.setAttribute("opacity", "0.75");
             svgConnections.appendChild(line);
 
             const midX = (startX + endX) / 2;
@@ -366,7 +369,7 @@ function drawConnections() {
             rect.setAttribute("fill", currentTheme === 'light' ? '#fafafa' : '#090d16');
             rect.setAttribute("stroke", strokeColor);
             rect.setAttribute("stroke-width", "1");
-            rect.setAttribute("opacity", "0.9");
+            rect.setAttribute("opacity", "0.95");
 
             const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
             text.setAttribute("x", midX);
@@ -474,7 +477,7 @@ function renderCanvasNodes() {
             <div class="h-1 w-full rounded-t-xl border-t-2 ${genderBorder}"></div>
             <div class="card-body-node p-3 flex-grow flex flex-col items-center text-center justify-between overflow-hidden">
                 <div class="flex items-center gap-1.5 justify-center w-full"><span class="text-lg leading-none">${genderIcon}</span></div>
-                <h4 class="font-mono font-bold text-xs text-ide-textBright hover:text-ide-accent cursor-pointer line-clamp-1 leading-snug w-full">${person.name}</h4>
+                <h4 class="font-mono font-bold text-xs text-ide-textBright hover:text-ide-accent cursor-pointer line-clamp-1 leading-snug w-full px-1">${person.name}</h4>
                 <div class="flex flex-col items-center gap-0.5">
                     <p class="text-[9px] text-ide-textMuted font-mono">${person.birthDate || '????'}${person.deathDate ? ` — ${person.deathDate}` : ' (живе)'}</p>
                     ${ageText ? `<span class="text-[8px] font-mono text-ide-accent font-semibold bg-ide-canvas/80 px-2 py-0.5 rounded-full border border-ide-accent/30">⏳ ${ageText}</span>` : ''}
@@ -502,7 +505,7 @@ function renderCanvasNodes() {
     });
 
     document.querySelectorAll('.quick-del-btn').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); deletePerson(b.getAttribute('data-id')); }));
-    drawConnections();
+    drawConnections(); 
 }
 
 function deletePerson(id) {
@@ -717,7 +720,6 @@ exportJsonBtn.addEventListener('click', () => {
     downloadAnchor.remove();
 });
 
-// Абсолютно надійний Експорт у PNG через конвертацію полотна у векторний SVG-контейнер з вбудованим HTML
 exportPngBtn.addEventListener('click', () => {
     if (!isExportEnabled || people.length === 0) return;
 
@@ -739,15 +741,13 @@ exportPngBtn.addEventListener('click', () => {
         const width = (maxX + padding) - minX;
         const height = (maxY + padding) - minY;
 
-        const svgHTML = svgConnections.outerHTML;
         const isLight = currentTheme === 'light';
         const bgColor = isLight ? '#fafafa' : '#0f172a';
-        const textColor = isLight ? '#18181b' : '#f8fafc';
         const mutedColor = isLight ? '#71717a' : '#94a3b8';
         const panelColor = isLight ? '#ffffff' : '#1e293b';
         const borderColor = isLight ? '#e4e4e7' : '#334155';
+        const textColor = isLight ? '#18181b' : '#f8fafc';
 
-        // Генерація сумісного SVG зі стандартними тегами (без зайвого foreignObject для надійності рендерингу)
         const cardsSvgString = people.map(p => {
             const genderBorder = p.gender === 'male' ? '#3b82f6' : '#ec4899';
             const genderIcon = p.gender === 'male' ? '👨' : '👩';
@@ -755,29 +755,17 @@ exportPngBtn.addEventListener('click', () => {
             
             return `
                 <g transform="translate(${p.x}, ${p.y})">
-                    <!-- Фон картки -->
                     <rect width="${CARD_WIDTH}" height="${CARD_HEIGHT}" rx="12" fill="${panelColor}" stroke="${borderColor}" stroke-width="1" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))" />
-                    <!-- Верхня кольорова смужка статі -->
                     <path d="M 12 0 L ${CARD_WIDTH - 12} 0 Q ${CARD_WIDTH} 0 ${CARD_WIDTH} 12 L ${CARD_WIDTH} 4 L 0 4 L 0 12 Q 0 0 12 0 Z" fill="${genderBorder}" />
-                    
-                    <!-- Іконка статі -->
                     <text x="${CARD_WIDTH / 2}" y="32" font-size="16" text-anchor="middle">${genderIcon}</text>
-                    
-                    <!-- Ім'я -->
-                    <text x="${CARD_WIDTH / 2}" y="56" fill="${textColor}" font-weight="700" font-size="11px" font-family="JetBrains Mono, monospace" text-anchor="middle">${escapeXml(p.name)}</text>
-                    
-                    <!-- Дати життя -->
+                    <text x="${CARD_WIDTH / 2}" y="56" fill="${textColor}" font-weight="700" font-size="11px" font-family="JetBrains Mono, monospace" text-anchor="middle" textLength="${Math.min(p.name.length * 6.5, CARD_WIDTH - 24)}" lengthAdjust="spacingAndGlyphs">${escapeXml(p.name)}</text>
                     <text x="${CARD_WIDTH / 2}" y="74" fill="${mutedColor}" font-size="9px" font-family="JetBrains Mono, monospace" text-anchor="middle">${p.birthDate || '????'}${p.deathDate ? ` — ${p.deathDate}` : ' (живе)'}</text>
-                    
-                    <!-- Вік / Роки -->
                     ${ageText ? `
                         <g transform="translate(${CARD_WIDTH / 2}, 92)">
                             <rect x="-45" y="-9" width="90" height="16" rx="8" fill="${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.3)'}" stroke="${isLight ? '#d4d4d8' : '#334155'}" stroke-width="0.5" />
                             <text x="0" y="2" fill="#10b981" font-size="8px" font-family="JetBrains Mono, monospace" font-weight="600" text-anchor="middle">⏳ ${ageText}</text>
                         </g>
                     ` : ''}
-                    
-                    <!-- Професія / Рід занять -->
                     ${p.occupation ? `
                         <text x="${CARD_WIDTH / 2}" y="124" fill="${mutedColor}" font-size="8px" font-family="JetBrains Mono, monospace" text-anchor="middle">💼 ${escapeXml(p.occupation)}</text>
                     ` : ''}
@@ -785,10 +773,44 @@ exportPngBtn.addEventListener('click', () => {
             `;
         }).join('');
 
+        let linesSvgString = "";
+        const processedPairs = new Set();
+        people.forEach(person => {
+            const startX = person.x + (CARD_WIDTH / 2);
+            const startY = person.y + (CARD_HEIGHT / 2);
+
+            person.relations.forEach(rel => {
+                const target = people.find(p => p.id === rel.personId);
+                if (!target) return;
+
+                const endX = target.x + (CARD_WIDTH / 2);
+                const endY = target.y + (CARD_HEIGHT / 2);
+
+                const pairKey = [person.id, target.id].sort().join('-') + '-' + rel.type;
+                if (processedPairs.has(pairKey)) return;
+                processedPairs.add(pairKey);
+
+                const strokeColor = getRelationColor(rel.type);
+                const isSpouse = (rel.type === "Чоловік" || rel.type === "Дружина");
+
+                linesSvgString += `<line x1="${startX}" y1="${startY}" x2="${endX}" y2="${endY}" stroke="${strokeColor}" stroke-width="2.5" ${isSpouse ? 'stroke-dasharray="5 5"' : ''} opacity="0.75" />`;
+
+                const midX = (startX + endX) / 2;
+                const midY = (startY + endY) / 2;
+
+                linesSvgString += `
+                    <g>
+                        <rect x="${midX - 35}" y="${midY - 9}" width="70" height="18" rx="5" fill="${isLight ? '#fafafa' : '#090d16'}" stroke="${strokeColor}" stroke-width="1" opacity="0.95" />
+                        <text x="${midX}" y="${midY + 4}" fill="${isLight ? '#18181b' : '#f8fafc'}" font-size="9px" font-family="JetBrains Mono, monospace" text-anchor="middle">${rel.type}</text>
+                    </g>
+                `;
+            });
+        });
+
         const svgString = `
             <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${width} ${height}">
                 <rect width="${width}" height="${height}" x="${minX}" y="${minY}" fill="${bgColor}" />
-                <g>${svgHTML}</g>
+                <g>${linesSvgString}</g>
                 <g>${cardsSvgString}</g>
             </svg>
         `;
@@ -822,7 +844,6 @@ exportPngBtn.addEventListener('click', () => {
     }, 400);
 });
 
-// Допоміжна функція для безпечного екранування спеціальних символів у текстах SVG
 function escapeXml(unsafe) {
     return unsafe.replace(/[<>&'"]/g, function (c) {
         switch (c) {
@@ -834,3 +855,9 @@ function escapeXml(unsafe) {
         }
     });
 }
+
+loadState();
+renderSidebar();
+renderCanvasNodes();
+resetCanvasView();
+applyTheme(currentTheme);
