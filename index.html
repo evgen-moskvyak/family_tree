@@ -121,7 +121,7 @@
                 <h1 class="font-mono text-lg font-bold tracking-tight text-ide-textBright flex items-center gap-2">
                     Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.2 від 23.07.26</span>
                 </h1>
-                <p class="text-[10px] text-ide-textMuted font-mono uppercase tracking-wider">Генеалогічна схема з інтерактивним перетягуванням та визначенням зв'язків</p>
+                <p class="text-[10px] text-ide-textMuted font-mono uppercase tracking-wider">Історія Вашого унікального родинного дерева</p>
             </div>
         </div>
 
@@ -144,7 +144,7 @@
             <!-- Кнопка збереження проекту -->
             <button id="export-json-btn" class="opacity-40 pointer-events-none cursor-not-allowed bg-ide-panel border border-ide-borderLight/40 hover:border-ide-accent text-ide-textBright hover:bg-ide-panelLight px-3.5 py-2 rounded-lg text-xs font-mono transition-all flex items-center gap-2 shadow-sm" title="Зберегти схему з усіма координатами у файл .json">
                 <span class="text-ide-accent">&lt;JSON&gt;</span>
-                <span>Зберегти у файл</span>
+                <span>Зберегти у файл (JSON)</span>
             </button>
         </div>
     </header>
@@ -156,7 +156,7 @@
         <aside id="sidebar" class="absolute lg:relative left-0 top-0 bottom-0 w-96 border-r border-ide-panel bg-[#0b0f19] p-4 flex flex-col shrink-0 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 z-20 shadow-xl lg:shadow-none">
             
             <div class="flex lg:hidden justify-between items-center mb-4 pb-2 border-b border-ide-panel">
-                <span class="font-mono text-xs font-bold text-ide-accent">// Члени родини</span>
+                <span class="font-mono text-xs font-bold text-ide-accent">Члени родини</span>
                 <button id="close-sidebar-btn" class="p-1 hover:bg-ide-panel rounded-lg text-ide-textMuted hover:text-ide-textBright">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -164,7 +164,7 @@
 
             <!-- Search Field -->
             <div class="mb-4">
-                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">// Виконати пошук</label>
+                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Виконати пошук</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-ide-textMuted">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -271,7 +271,7 @@
 
                 <!-- Occupation (Ким працювала людина) -->
                 <div>
-                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (Ким працювала людина)</label>
+                    <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (не обов'язково)</label>
                     <input 
                         type="text" 
                         id="edit-person-occupation"
@@ -358,7 +358,7 @@
 
                     <!-- Current active relations list -->
                     <div class="space-y-1.5 pt-2">
-                        <span class="block text-[9px] font-mono font-bold uppercase text-ide-textMuted">// Поточні зв'язки цієї особи:</span>
+                        <span class="block text-[9px] font-mono font-bold uppercase text-ide-textMuted">Поточні зв'язки цієї особи:</span>
                         <div id="modal-active-relations-list" class="space-y-1 max-h-32 overflow-y-auto pr-1">
                             <!-- Dynamic Active Relations Items -->
                         </div>
@@ -414,9 +414,9 @@
             
             <div class="space-y-2">
                 <span class="text-5xl animate-pulse block font-sans">🌿</span>
-                <h2 class="font-mono text-2xl font-bold text-ide-accent tracking-tight">// Ваша родинна хроніка</h2>
+                <h2 class="font-mono text-2xl font-bold text-ide-accent tracking-tight">Ваша родинна хроніка</h2>
                 <p class="text-ide-textMuted text-xs max-w-md mx-auto leading-relaxed">
-                    Ласкаво просимо до вашої інтерактивної Родинної Хроніки. Створюйте картки та керуйте вашими даними, додавайте зв'язки та візуалізуйте історію вашої спадщини.
+                    Ласкаво просимо до Родинної Хроніки. Збирайте спогади, додавайте рідних і зв'язуйте їх між собою, щоб наочно побачити унікальну історію вашого роду.
                 </p>
             </div>
 
@@ -441,14 +441,14 @@
             <p class="text-[15px] text-ide-textMuted/50 font-mono italic">
                 Всі дані зберігаються виключно у вашому браузері. Виконав Євген Москвяк за допомогою AI
             </p>
-<p class="text-[11px] text-ide-textMuted/50 font-mono italic">
-    Зв'язатись зі мною: 
-    <a href="https://www.linkedin.com/in/evgen-moskvyak" 
-       target="_blank" 
-       class="text-ide-accent hover:underline underline-offset-2">
-       Linkedin
-    </a>
-</p>
+            <p class="text-[11px] text-ide-textMuted/50 font-mono italic">
+                Зв'язатись зі мною: 
+                <a href="https://www.linkedin.com/in/evgen-moskvyak" 
+                   target="_blank" 
+                   class="text-ide-accent hover:underline underline-offset-2">
+                   Linkedin
+                </a>
+            </p>
         </div>
     </div>
 
@@ -839,7 +839,6 @@
             const cardWidth = CARD_WIDTH;  
             const cardHeight = CARD_HEIGHT; 
             
-            // To prevent duplicate lines for same pair of nodes of same type, track drew relations
             const processedPairs = new Set();
 
             people.forEach(person => {
@@ -856,16 +855,13 @@
                     const endX = target.x + (cardWidth / 2);
                     const endY = target.y + (cardHeight / 2);
 
-                    // Generate a unique key for the pair
                     const pairKey = [person.id, target.id].sort().join('-') + '-' + rel.type;
                     if (processedPairs.has(pairKey)) return;
                     processedPairs.add(pairKey);
 
-                    // Color lines based on relationship type
                     const strokeColor = getRelationColor(rel.type);
                     const isSpouse = (rel.type === "Чоловік" || rel.type === "Дружина");
 
-                    // Create the Connection line
                     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                     line.setAttribute("x1", startX);
                     line.setAttribute("y1", startY);
@@ -880,11 +876,9 @@
                     line.setAttribute("opacity", "0.65");
                     svgConnections.appendChild(line);
 
-                    // Create Relationship Text Badge along the connection
                     const midX = (startX + endX) / 2;
                     const midY = (startY + endY) / 2;
 
-                    // Container of text to keep it stylized and readable
                     const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                     
                     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -923,7 +917,7 @@
                 return;
             }
 
-            filtered.forEach(p => {
+            filtered.forEach((p, index) => {
                 const isSelected = p.id === activePersonId;
                 const borderClass = isSelected ? 'border-ide-accent bg-ide-panelLight/60' : 'border-transparent';
                 
@@ -933,13 +927,17 @@
 
                 const genderIcon = p.gender === 'male' ? '👨' : '👩';
 
+                // Додано нумерацію на початку картки списку (index + 1)
                 div.innerHTML = `
-                    <div class="min-w-0 pr-2 flex-grow">
-                        <p class="font-mono text-xs truncate text-ide-textBright flex items-center">
-                            <span class="mr-1">${genderIcon}</span>
-                            <span class="truncate">${p.name}</span>
-                        </p>
-                        <p class="text-[9px] font-mono text-ide-textMuted mt-0.5">${p.birthDate || '????'}${p.deathDate ? ` — ${p.deathDate}` : ''}</p>
+                    <div class="min-w-0 pr-2 flex-grow flex items-center gap-2">
+                        <span class="font-mono text-[10px] text-ide-accent font-bold">${index + 1}.</span>
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs truncate text-ide-textBright flex items-center">
+                                <span class="mr-1">${genderIcon}</span>
+                                <span class="truncate">${p.name}</span>
+                            </p>
+                            <p class="text-[9px] font-mono text-ide-textMuted mt-0.5">${p.birthDate || '????'}${p.deathDate ? ` — ${p.deathDate}` : ''}</p>
+                        </div>
                     </div>
                     <div class="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                         <button class="focus-btn-sidebar p-1 hover:bg-ide-panel rounded text-ide-accent" data-id="${p.id}" title="Знайти на карті">🔍</button>
@@ -1034,13 +1032,11 @@
                         ` : ''}
                     </div>
 
-                    <!-- Clean simple footer with only delete action -->
                     <div class="bg-ide-canvas/50 border-t border-ide-panelLight/20 px-3 py-1.5 flex justify-end items-center shrink-0">
                         <button class="quick-del-btn text-red-400 hover:text-red-500 font-mono text-[10px] font-bold" data-id="${person.id}">Видалити (X)</button>
                     </div>
                 `;
 
-                // Set drag start coordinate offset
                 card.addEventListener('mousedown', (e) => {
                     if (e.target.closest('button')) return;
                     e.stopPropagation();
@@ -1054,7 +1050,6 @@
                     dragOffset.y = (e.clientY - bounds.top) / zoomScale;
                 });
 
-                // Double click interaction triggers editor
                 card.addEventListener('dblclick', (e) => {
                     e.stopPropagation();
                     openEditor(person.id);
@@ -1076,7 +1071,6 @@
                 "Видалення вузла", 
                 `Ви дійсно хочете видалити ${p.name}? Всі існуючі зв'язки з цією особою будуть анульовані.`, 
                 () => {
-                    // Remove person and cleanup their relationships inside other nodes
                     people = people.filter(item => item.id !== id).map(item => {
                         let updated = { ...item };
                         if (updated.relations) {
@@ -1109,7 +1103,6 @@
                 document.getElementById('edit-person-death').value = person.deathDate || '';
                 document.getElementById('edit-person-notes').value = person.notes || '';
 
-                // Copy real relationships to temporary array
                 tempRelations = person.relations ? JSON.parse(JSON.stringify(person.relations)) : [];
                 document.getElementById('relations-manager-container').classList.remove('hidden');
             } else {
@@ -1122,9 +1115,8 @@
                 document.getElementById('edit-person-death').value = '';
                 document.getElementById('edit-person-notes').value = '';
 
-                // Empty state for relations when creating a card
                 tempRelations = [];
-                document.getElementById('relations-manager-container').classList.add('hidden'); // Hide relation manager on first creation
+                document.getElementById('relations-manager-container').classList.add('hidden');
             }
 
             renderTempRelationsList();
@@ -1135,7 +1127,6 @@
             }, 10);
         }
 
-        // Populate Target Person Dropdown for relations Setup
         function populateRelationTargetsDropdown(excludeId = null) {
             relationTargetSelect.innerHTML = '<option value="" class="bg-ide-panel">-- Оберіть особу --</option>';
             people.forEach(p => {
@@ -1144,7 +1135,6 @@
             });
         }
 
-        // Render Active temporary relations inside edit modal
         function renderTempRelationsList() {
             modalActiveRelationsList.innerHTML = "";
             if (tempRelations.length === 0) {
@@ -1165,7 +1155,6 @@
                 modalActiveRelationsList.appendChild(div);
             });
 
-            // Bind remove triggers
             document.querySelectorAll('.btn-remove-temp-relation').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const idx = parseInt(btn.getAttribute('data-index'));
@@ -1175,7 +1164,6 @@
             });
         }
 
-        // Add relationship button handler
         btnAddRelationItem.addEventListener('click', () => {
             const targetId = relationTargetSelect.value;
             const relType = relationTypeSelect.value;
@@ -1185,13 +1173,11 @@
                 return;
             }
 
-            // Check if already exists in temporary list
             if (tempRelations.some(r => r.personId === targetId)) {
                 customAlert("Дублікат зв'язку", "Ви вже встановили зв'язок із цією особою.", '⚠️');
                 return;
             }
 
-            // Push to modal temporary relations state
             tempRelations.push({ personId: targetId, type: relType });
             renderTempRelationsList();
         });
@@ -1232,7 +1218,7 @@
                 notes: document.getElementById('edit-person-notes').value,
                 birthDate: document.getElementById('edit-person-birth').value,
                 deathDate: document.getElementById('edit-person-death').value,
-                relations: tempRelations, // Save active relationships configured
+                relations: tempRelations,
                 x: calculatedX,
                 y: calculatedY
             };
@@ -1243,14 +1229,11 @@
                 people.push(savedPerson);
             }
 
-            // Sync reciprocal connections automatically to ensure drawing coherence
             savedPerson.relations.forEach(rel => {
                 const targetObj = people.find(p => p.id === rel.personId);
                 if (targetObj) {
                     if (!targetObj.relations) targetObj.relations = [];
-                    // Ensure the target person has a link back if it doesn't already exist
                     if (!targetObj.relations.some(r => r.personId === savedPerson.id)) {
-                        // Find reciprocal relationship title
                         let reciprocalType = rel.type;
                         if (rel.type === "Батько" || rel.type === "Мати") {
                             reciprocalType = targetObj.gender === "male" ? "Син" : "Дочка";
