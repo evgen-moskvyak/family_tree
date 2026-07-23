@@ -119,7 +119,7 @@
             </div>
             <div>
                 <h1 class="font-mono text-lg font-bold tracking-tight text-ide-textBright flex items-center gap-2">
-                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.1 від 27.06.26</span>
+                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.2 від 23.07.26</span>
                 </h1>
                 <p class="text-[10px] text-ide-textMuted font-mono uppercase tracking-wider">Генеалогічна схема з інтерактивним перетягуванням та визначенням зв'язків</p>
             </div>
@@ -1113,7 +1113,7 @@
                 tempRelations = person.relations ? JSON.parse(JSON.stringify(person.relations)) : [];
                 document.getElementById('relations-manager-container').classList.remove('hidden');
             } else {
-                document.getElementById('modal-title-text').innerText = "Create_Relation_Node.sh";
+                document.getElementById('modal-title-text').innerText = "Створення нової особи";
                 document.getElementById('edit-person-id').value = Date.now().toString();
                 document.getElementById('edit-person-name').value = '';
                 document.getElementById('edit-person-occupation').value = '';
