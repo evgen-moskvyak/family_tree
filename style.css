@@ -1,0 +1,69 @@
+:root {
+    --ide-bg: #090d16;
+    --ide-canvas: #0f172a;
+    --ide-panel: #1e293b;
+    --ide-panel-light: #334155;
+    --ide-border: #1e293b;
+    --ide-border-light: #334155;
+    --ide-text-bright: #f8fafc;
+    --ide-text-muted: #94a3b8;
+    --ide-accent: #10b981;
+    --ide-accent-glow: rgba(16, 185, 129, 0.25);
+    --ide-male: #3b82f6;
+    --ide-female: #ec4899;
+    --grid-color: rgba(255, 255, 255, 0.02);
+    --header-bg: #0c1322;
+    --sidebar-bg: #0b0f19;
+}
+
+body.theme-light {
+    --ide-bg: #f4f4f5;
+    --ide-canvas: #fafafa;
+    --ide-panel: #ffffff;
+    --ide-panel-light: #e4e4e7;
+    --ide-border: #e4e4e7;
+    --ide-border-light: #d4d4d8;
+    --ide-text-bright: #18181b;
+    --ide-text-muted: #71717a;
+    --ide-accent: #0d9488; 
+    --ide-accent-glow: rgba(13, 148, 136, 0.2);
+    --ide-male: #2563eb;
+    --ide-female: #db2777;
+    --grid-color: rgba(0, 0, 0, 0.03);
+    --header-bg: #ffffff;
+    --sidebar-bg: #ffffff;
+}
+
+body {
+    background-color: var(--ide-bg);
+    color: var(--ide-text-bright);
+    user-select: none;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--ide-bg);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--ide-panel-light);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ide-border-light);
+}
+
+.grid-bg {
+    background-size: 32px 32px;
+    background-image: 
+        linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+}
+
+.neon-active {
+    box-shadow: 0 0 20px var(--ide-accent-glow) !important;
+    border-color: var(--ide-accent) !important;
+}
