@@ -978,17 +978,17 @@
                 const genderIcon = p.gender === 'male' ? '👨' : '👩';
 
                 div.innerHTML = `
-                    <div class="min-w-0 pr-2 flex-grow flex items-center gap-2">
-                        <span class="font-mono text-[10px] text-ide-accent font-bold">${index + 1}.</span>
-                        <div class="min-w-0">
-                            <p class="font-mono text-xs truncate text-ide-textBright flex items-center">
-                                <span class="mr-1">${genderIcon}</span>
-                                <span class="truncate">${p.name}</span>
+                    <div class="min-w-0 pr-2 flex-grow flex items-start gap-2">
+                        <span class="font-mono text-[10px] text-ide-accent font-bold mt-0.5">${index + 1}.</span>
+                        <div class="min-w-0 flex-grow">
+                            <p class="font-mono text-xs text-ide-textBright flex items-start whitespace-normal break-words leading-tight">
+                                <span class="mr-1 shrink-0">${genderIcon}</span>
+                                <span>${p.name}</span>
                             </p>
-                            <p class="text-[9px] font-mono text-ide-textMuted mt-0.5">${p.birthDate || '????'}${p.deathDate ? ` — ${p.deathDate}` : ''}</p>
+                            <p class="text-[9px] font-mono text-ide-textMuted mt-1">${p.birthDate || '????'}${p.deathDate ? ` — ${p.deathDate}` : ''}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    <div class="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-center">
                         <button class="focus-btn-sidebar p-1 hover:bg-ide-panel rounded text-ide-accent" data-id="${p.id}" title="Знайти на карті">🔍</button>
                         <button class="edit-btn-sidebar p-1 hover:bg-ide-panel rounded text-ide-textMuted hover:text-ide-textBright" data-id="${p.id}" title="Редагувати">📝</button>
                         <button class="delete-btn-sidebar p-1 hover:bg-red-950/40 rounded text-ide-textMuted hover:text-red-400" data-id="${p.id}" title="Видалити">🗑️</button>
