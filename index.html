@@ -119,7 +119,7 @@
             </div>
             <div>
                 <h1 class="font-mono text-lg font-bold tracking-tight text-ide-textBright flex items-center gap-2">
-                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.2 від 23.07.26</span>
+                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.3 від 23.07.26</span>
                 </h1>
                 <p class="text-[10px] text-ide-textMuted font-mono uppercase tracking-wider">Історія Вашого унікального родинного дерева</p>
             </div>
@@ -269,7 +269,7 @@
                     />
                 </div>
 
-                <!-- Occupation (Ким працювала людина) -->
+                <!-- Occupation -->
                 <div>
                     <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-ide-textMuted mb-1.5">Професія або Рід Занять (не обов'язково)</label>
                     <input 
@@ -310,6 +310,12 @@
                             class="w-full bg-ide-canvas border border-ide-panelLight/40 rounded-lg px-3 py-2 text-xs font-mono text-ide-textBright focus:outline-none focus:ring-1 focus:ring-ide-accent transition-all placeholder-ide-textMuted/40"
                         />
                     </div>
+                </div>
+
+                <!-- Блок виведення розрахованої кількості років -->
+                <div id="calculated-years-badge" class="hidden bg-ide-canvas/60 border border-ide-accent/40 rounded-lg px-3 py-2 text-xs font-mono text-ide-accent flex items-center justify-between">
+                    <span id="calculated-years-label">⏳ Розрахунок років:</span>
+                    <span id="calculated-years-value" class="font-bold"></span>
                 </div>
 
                 <!-- Dynamic Relationship Manager -->
@@ -459,7 +465,6 @@
         let activePersonId = null; 
         let currentTheme = 'dark'; 
 
-        // Temporary relations array within Modal Session
         let tempRelations = [];
 
         // --- Zoom & Pan Coordinates ---
@@ -475,8 +480,8 @@
 
         const CANVAS_CENTER_X = 2000;
         const CANVAS_CENTER_Y = 2000;
-        const CARD_WIDTH = 224;  // Fixed uniform card width (w-56)
-        const CARD_HEIGHT = 150; // Fixed uniform card height
+        const CARD_WIDTH = 224;  
+        const CARD_HEIGHT = 150; 
 
         // --- DOM Elements ---
         const searchInput = document.getElementById('search-input');
@@ -506,28 +511,69 @@
         const dialogMessage = document.getElementById('dialog-message');
         const dialogActions = document.getElementById('dialog-actions');
 
-        // Sidebar mobile drawers
         const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
         const closeSidebarBtn = document.getElementById('close-sidebar-btn');
         const sidebar = document.getElementById('sidebar');
 
-        // Zoom controls DOM
         const zoomInBtn = document.getElementById('zoom-in-btn');
         const zoomOutBtn = document.getElementById('zoom-out-btn');
         const zoomResetBtn = document.getElementById('zoom-reset-btn');
         const zoomValue = document.getElementById('zoom-value');
 
-        // Onboarding DOM
         const onboardingOverlay = document.getElementById('onboarding-overlay');
         const onboardStartBtn = document.getElementById('onboard-start-btn');
         const onboardDragZone = document.getElementById('onboard-drag-zone');
         const onboardImportFile = document.getElementById('onboard-import-file');
 
-        // Relation Manager DOM elements
         const relationTargetSelect = document.getElementById('relation-target-select');
         const relationTypeSelect = document.getElementById('relation-type-select');
         const btnAddRelationItem = document.getElementById('btn-add-relation-item');
         const modalActiveRelationsList = document.getElementById('modal-active-relations-list');
+
+        const editPersonBirth = document.getElementById('edit-person-birth');
+        const editPersonDeath = document.getElementById('edit-person-death');
+        const calculatedYearsBadge = document.getElementById('calculated-years-badge');
+        const calculatedYearsValue = document.getElementById('calculated-years-value');
+
+        // Допоміжна функція розрахунку років за датами
+        function calculateAgeOrLifespan(birthVal, deathVal) {
+            const extractYear = (str) => {
+                if (!str) return null;
+                const match = str.match(/\d{4}/);
+                return match ? parseInt(match[0], 10) : null;
+            };
+
+            const birthYear = extractYear(birthVal);
+            const deathYear = extractYear(deathVal);
+
+            if (birthYear !== null) {
+                if (deathYear !== null) {
+                    const diff = deathYear - birthYear;
+                    return diff >= 0 ? `${diff} р. (прожито)` : null;
+                } else {
+                    const currentYear = new Date().getFullYear();
+                    const age = currentYear - birthYear;
+                    return age >= 0 ? `${age} р. (вік)` : null;
+                }
+            }
+            return null;
+        }
+
+        function updateCalculatedYears() {
+            const birthVal = editPersonBirth.value.trim();
+            const deathVal = editPersonDeath.value.trim();
+            const resultText = calculateAgeOrLifespan(birthVal, deathVal);
+
+            if (resultText) {
+                calculatedYearsBadge.classList.remove('hidden');
+                calculatedYearsValue.innerText = resultText;
+            } else {
+                calculatedYearsBadge.classList.add('hidden');
+            }
+        }
+
+        editPersonBirth.addEventListener('input', updateCalculatedYears);
+        editPersonDeath.addEventListener('input', updateCalculatedYears);
 
         function applyTheme(theme) {
             const body = document.body;
@@ -780,7 +826,6 @@
             }
         });
 
-        // Touch gestures
         canvasViewport.addEventListener('touchstart', (e) => {
             if (e.target.closest('button') || e.target.closest('.card-body-node')) return;
             isPanning = true;
@@ -817,20 +862,20 @@
                 case "Мати":
                 case "Дідусь":
                 case "Бабуся":
-                    return "#10b981"; // Emerald green
+                    return "#10b981"; 
                 case "Чоловік":
                 case "Дружина":
-                    return "#eab308"; // Amber yellow
+                    return "#eab308"; 
                 case "Син":
                 case "Дочка":
                 case "Племінник":
                 case "Племінниця":
-                    return "#3b82f6"; // Blue
+                    return "#3b82f6"; 
                 case "Брат":
                 case "Сестра":
-                    return "#a855f7"; // Purple
+                    return "#a855f7"; 
                 default:
-                    return "#06b6d4"; // Cyan for custom or other relations
+                    return "#06b6d4"; 
             }
         }
 
@@ -927,7 +972,6 @@
 
                 const genderIcon = p.gender === 'male' ? '👨' : '👩';
 
-                // Додано нумерацію на початку картки списку (index + 1)
                 div.innerHTML = `
                     <div class="min-w-0 pr-2 flex-grow flex items-center gap-2">
                         <span class="font-mono text-[10px] text-ide-accent font-bold">${index + 1}.</span>
@@ -1007,27 +1051,32 @@
                 const genderBorder = person.gender === 'male' ? 'border-t-ide-male' : 'border-t-ide-female';
                 const genderIcon = person.gender === 'male' ? '👨' : '👩';
 
+                // Розрахунок років для виведення на картці
+                const ageText = calculateAgeOrLifespan(person.birthDate, person.deathDate);
+
                 card.innerHTML = `
                     <div class="h-1 w-full rounded-t-xl border-t-2 ${genderBorder}"></div>
                     
                     <div class="card-body-node p-3 flex-grow flex flex-col items-center text-center justify-between overflow-hidden">
                         <div class="flex items-center gap-1.5 justify-center w-full">
-                            <span class="text-lg">${genderIcon}</span>
+                            <span class="text-lg leading-none">${genderIcon}</span>
                         </div>
-                        <h4 class="font-mono font-bold text-xs text-ide-textBright hover:text-ide-accent cursor-pointer line-clamp-2 leading-snug w-full">
+                        <h4 class="font-mono font-bold text-xs text-ide-textBright hover:text-ide-accent cursor-pointer line-clamp-1 leading-snug w-full">
                             ${person.name}
                         </h4>
-                        <p class="text-[9px] text-ide-textMuted font-mono">
-                            ${person.birthDate || '????'}${person.deathDate ? ` — ${person.deathDate}` : ' (живе)'}
-                        </p>
-                        ${person.occupation ? `
-                            <p class="text-[8px] font-mono text-ide-accent bg-ide-canvas/60 px-1.5 py-0.5 rounded-md max-w-full truncate">
-                                💼 ${person.occupation}
+                        <div class="flex flex-col items-center gap-0.5">
+                            <p class="text-[9px] text-ide-textMuted font-mono">
+                                ${person.birthDate || '????'}${person.deathDate ? ` — ${person.deathDate}` : ' (живе)'}
                             </p>
-                        ` : ''}
-                        ${person.notes ? `
-                            <p class="text-[8px] font-mono text-ide-textMuted italic line-clamp-1 max-w-full border-t border-dashed border-ide-panelLight/40 pt-1 w-full">
-                                # ${person.notes}
+                            ${ageText ? `
+                                <span class="text-[8px] font-mono text-ide-accent font-semibold bg-ide-canvas/80 px-2 py-0.5 rounded-full border border-ide-accent/30">
+                                    ⏳ ${ageText}
+                                </span>
+                            ` : ''}
+                        </div>
+                        ${person.occupation ? `
+                            <p class="text-[8px] font-mono text-ide-textMuted bg-ide-canvas/60 px-1.5 py-0.5 rounded-md max-w-full truncate">
+                                💼 ${person.occupation}
                             </p>
                         ` : ''}
                     </div>
@@ -1099,8 +1148,8 @@
                 document.getElementById('edit-person-name').value = person.name || '';
                 document.getElementById('edit-person-occupation').value = person.occupation || '';
                 document.getElementById('edit-person-gender').value = person.gender || 'male';
-                document.getElementById('edit-person-birth').value = person.birthDate || '';
-                document.getElementById('edit-person-death').value = person.deathDate || '';
+                editPersonBirth.value = person.birthDate || '';
+                editPersonDeath.value = person.deathDate || '';
                 document.getElementById('edit-person-notes').value = person.notes || '';
 
                 tempRelations = person.relations ? JSON.parse(JSON.stringify(person.relations)) : [];
@@ -1111,14 +1160,15 @@
                 document.getElementById('edit-person-name').value = '';
                 document.getElementById('edit-person-occupation').value = '';
                 document.getElementById('edit-person-gender').value = 'male';
-                document.getElementById('edit-person-birth').value = '';
-                document.getElementById('edit-person-death').value = '';
+                editPersonBirth.value = '';
+                editPersonDeath.value = '';
                 document.getElementById('edit-person-notes').value = '';
 
                 tempRelations = [];
                 document.getElementById('relations-manager-container').classList.add('hidden');
             }
 
+            updateCalculatedYears();
             renderTempRelationsList();
             editorModal.classList.remove('hidden');
             editorModal.classList.add('flex');
@@ -1216,8 +1266,8 @@
                 occupation: document.getElementById('edit-person-occupation').value,
                 gender: document.getElementById('edit-person-gender').value,
                 notes: document.getElementById('edit-person-notes').value,
-                birthDate: document.getElementById('edit-person-birth').value,
-                deathDate: document.getElementById('edit-person-death').value,
+                birthDate: editPersonBirth.value,
+                deathDate: editPersonDeath.value,
                 relations: tempRelations,
                 x: calculatedX,
                 y: calculatedY
