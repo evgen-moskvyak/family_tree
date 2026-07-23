@@ -55,6 +55,8 @@
             --ide-male: #3b82f6;
             --ide-female: #ec4899;
             --grid-color: rgba(255, 255, 255, 0.02);
+            --header-bg: #0c1322;
+            --sidebar-bg: #0b0f19;
         }
         
         body.theme-light {
@@ -72,6 +74,8 @@
             --ide-male: #2563eb;
             --ide-female: #db2777;
             --grid-color: rgba(0, 0, 0, 0.03);
+            --header-bg: #ffffff;
+            --sidebar-bg: #ffffff;
         }
  
         body {
@@ -112,14 +116,14 @@
 <body class="font-sans antialiased overflow-hidden h-screen flex flex-col bg-ide-bg text-ide-textBright">
 
     <!-- Header -->
-    <header class="border-b border-ide-panel/80 bg-[#0c1322] px-6 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-md z-30 shrink-0">
+    <header class="border-b border-ide-panel/80 bg-[var(--header-bg)] px-6 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-md z-30 shrink-0 transition-colors">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-ide-accent/10 border border-ide-accent flex items-center justify-center text-xl shadow-lg shadow-ide-accent/5">
                 <span class="text-ide-accent font-mono font-bold">&lt;/&gt;</span>
             </div>
             <div>
                 <h1 class="font-mono text-lg font-bold tracking-tight text-ide-textBright flex items-center gap-2">
-                    Родинна Хроніка <span class="text-xs bg-ide-panel px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.3 від 23.07.26</span>
+                    Родинна Хроніка <span class="text-xs bg-ide-panel border border-ide-borderLight/40 px-2 py-0.5 rounded text-ide-accent font-mono font-medium">Версія 4.3 від 23.07.26</span>
                 </h1>
                 <p class="text-[10px] text-ide-textMuted font-mono uppercase tracking-wider">Історія Вашого унікального родинного дерева</p>
             </div>
@@ -153,7 +157,7 @@
     <div class="flex-grow flex flex-row min-h-0 relative">
         
         <!-- Sidebar Panel -->
-        <aside id="sidebar" class="absolute lg:relative left-0 top-0 bottom-0 w-96 border-r border-ide-panel bg-[#0b0f19] p-4 flex flex-col shrink-0 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 z-20 shadow-xl lg:shadow-none">
+        <aside id="sidebar" class="absolute lg:relative left-0 top-0 bottom-0 w-96 border-r border-ide-panel bg-[var(--sidebar-bg)] p-4 flex flex-col shrink-0 transition-all duration-300 transform -translate-x-full lg:translate-x-0 z-20 shadow-xl lg:shadow-none">
             
             <div class="flex lg:hidden justify-between items-center mb-4 pb-2 border-b border-ide-panel">
                 <span class="font-mono text-xs font-bold text-ide-accent">Члени родини</span>
@@ -241,7 +245,7 @@
     </div>
 
     <!-- Modal Dialog (Editor) -->
-    <div id="editor-modal" class="fixed inset-0 bg-ide-bg/85 z-50 hidden items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
+    <div id="editor-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
         <div class="bg-ide-panel rounded-2xl max-w-lg w-full shadow-2xl border border-ide-panelLight/30 flex flex-col overflow-hidden max-h-[95vh] scale-95 transition-transform duration-300" id="editor-modal-container">
             
             <div class="p-5 border-b border-ide-panelLight/40 bg-ide-canvas/40 flex justify-between items-center">
@@ -403,7 +407,7 @@
     </div>
 
     <!-- Custom Dialog Modal -->
-    <div id="dialog-modal" class="fixed inset-0 bg-ide-bg/85 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div id="dialog-modal" class="fixed inset-0 bg-black/50 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-ide-panel rounded-xl max-w-sm w-full p-6 shadow-2xl border border-ide-panelLight/40 text-center space-y-4">
             <span id="dialog-icon" class="text-3xl block">💡</span>
             <h3 id="dialog-title" class="font-mono text-sm font-bold text-ide-accent">Alert_Dialog</h3>
@@ -415,8 +419,8 @@
     </div>
 
     <!-- Welcome / Onboarding Panel -->
-    <div id="onboarding-overlay" class="fixed inset-0 bg-[#090d16] z-[40] flex items-center justify-center p-6 overflow-y-auto">
-        <div class="max-w-xl w-full text-center space-y-6 py-6 border border-ide-panelLight/20 bg-ide-canvas/55 p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+    <div id="onboarding-overlay" class="fixed inset-0 bg-ide-bg z-[40] flex items-center justify-center p-6 overflow-y-auto transition-colors">
+        <div class="max-w-xl w-full text-center space-y-6 py-6 border border-ide-panelLight/20 bg-ide-canvas p-8 rounded-2xl shadow-2xl backdrop-blur-md">
             
             <div class="space-y-2">
                 <span class="text-5xl animate-pulse block font-sans">🌿</span>
@@ -591,6 +595,7 @@
             }
             currentTheme = theme;
             localStorage.setItem('family_tree_theme', theme);
+            drawConnections(); // перемалювати з'єднання з урахуванням кольорів теми
         }
 
         if (themeToggleBtn) {
@@ -1051,7 +1056,6 @@
                 const genderBorder = person.gender === 'male' ? 'border-t-ide-male' : 'border-t-ide-female';
                 const genderIcon = person.gender === 'male' ? '👨' : '👩';
 
-                // Розрахунок років для виведення на картці
                 const ageText = calculateAgeOrLifespan(person.birthDate, person.deathDate);
 
                 card.innerHTML = `
